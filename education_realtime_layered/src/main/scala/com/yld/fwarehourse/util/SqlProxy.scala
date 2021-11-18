@@ -38,7 +38,6 @@ class SqlProxy {
 
   /**
     * 执行查询语句
-    * 执行查询语句
     *
     * @param conn
     * @param sql

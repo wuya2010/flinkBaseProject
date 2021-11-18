@@ -35,7 +35,7 @@ object UniqueVisitor {
   }
 }
 
-// 自定义all window function
+// 自定义all window function ==》  [IN, OUT, W <: Window]
 class UvCountByAllWindow() extends AllWindowFunction[UserBehavior, UvCount, TimeWindow]{
   override def apply(window: TimeWindow, input: Iterable[UserBehavior], out: Collector[UvCount]): Unit = {
     // 用一个set来做去重
@@ -44,7 +44,7 @@ class UvCountByAllWindow() extends AllWindowFunction[UserBehavior, UvCount, Time
     for( userBehavior <- input ){
       idSet += userBehavior.userId
     }
-    //输出结果
+    //输出结果，加上窗口截至时间
     out.collect( UvCount(window.getEnd, idSet.size) )
   }
 }

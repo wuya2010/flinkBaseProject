@@ -8,13 +8,13 @@ import org.apache.flink.streaming.api.windowing.time.Time
 import org.apache.flink.util.Collector
 
 /**
-  * Copyright (c) 2018-2028 尚硅谷 All Rights Reserved 
+  *
   *
   * Project: UserBehaviorAnalysis
   * Package: com.atguigu.orderpay_detect
   * Version: 1.0
   *
-  * Created by wushengran on 2019/10/28 15:15
+  *  2019/10/28 15:15
   */
 object TxMatchWithJoin {
   def main(args: Array[String]): Unit = {

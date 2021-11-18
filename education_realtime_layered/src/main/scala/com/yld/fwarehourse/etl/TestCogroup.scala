@@ -3,8 +3,8 @@
 import java.util.Properties
 
 import DImJoinData.MemberLeftJoinRegtype
-import com.atguigu.education.model.{DwdMemberDeserializationSchema, DwdMemberRegtypeDeserializationSchema}
-import com.atguigu.education.util.ParseJsonData
+import com.alibaba.education.model.{DwdMemberDeserializationSchema, DwdMemberRegtypeDeserializationSchema}
+import com.yld.fwarehourse.util.ParseJsonData
 import main.scala.com.yld.fwarehourse.bean.{DwdMember, DwdMemberRegtype}
 import org.apache.flink.api.common.restartstrategy.RestartStrategies
 import org.apache.flink.api.scala._

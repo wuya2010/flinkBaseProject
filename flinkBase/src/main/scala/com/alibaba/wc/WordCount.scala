@@ -1,15 +1,15 @@
-package com.atguigu.wc
+package com.alibaba.wc
 
 import org.apache.flink.api.scala._
 
 /**
-  * Copyright (c) 2018-2028 尚硅谷 All Rights Reserved 
+  *
   *
   * Project: FlinkTutorial
   * Package: com.atguigu.wc
   * Version: 1.0
   *
-  * Created by wushengran on 2019/10/18 11:23
+  *  2019/10/18 11:23
   */
 
 // 批处理word count程序

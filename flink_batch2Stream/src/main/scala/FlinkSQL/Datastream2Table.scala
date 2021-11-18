@@ -21,7 +21,7 @@ object Datastream2Table  {
     //SteamTableEnvironment
     val TableEnv = StreamTableEnvironment.create(env)
 
-    val inputStream: DataStream[String] = env.readTextFile("E:\\01_myselfProject\\Base\\spark_flink_project\\flink_streaming\\src\\main\\resources\\sensor.txt")
+    val inputStream: DataStream[String] = env.readTextFile("E:\\WORKS\\Mine\\flinkBaseProject\\flink_batch2Stream\\src\\main\\resources\\sensor.txt")
     val dataStream: DataStream[SensorReading] = inputStream
       .map(data => {
         val dataArray = data.split(",").map(x=>x.trim)
@@ -48,7 +48,7 @@ object Datastream2Table  {
 //    |-- timestamp: BIGINT
 //    |-- temperature: DOUBLE
 
-    //输出到外部表
+    //类似脚本： 输出到外部表
     TableEnv.connect(
       new FileSystem().path("out.txt")
     )

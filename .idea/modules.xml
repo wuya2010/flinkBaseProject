@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project version="4">
-  <component name="ProjectModuleManager">
-    <modules>
-      <module fileurl="file://$PROJECT_DIR$/flink_base_application_byMine/flink_base_application_byMine.iml" filepath="$PROJECT_DIR$/flink_base_application_byMine/flink_base_application_byMine.iml" />
-      <module fileurl="file://$PROJECT_DIR$/flink_batch2Stream/flink_batch2Stream.iml" filepath="$PROJECT_DIR$/flink_batch2Stream/flink_batch2Stream.iml" />
-    </modules>
-  </component>
-</project>

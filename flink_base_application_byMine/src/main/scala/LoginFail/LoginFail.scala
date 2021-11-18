@@ -69,10 +69,13 @@ class LoginFailWarning(failTimes: Int) extends KeyedProcessFunction[Long, LoginE
   }
 }
 
+// 状态保存 <K, I, O>
 class LoginFailWarningAdv(failTimes: Int) extends KeyedProcessFunction[Long, LoginEvent, Warning]{
   // 定义一个List状态，用于保存连续登录失败的事件
+  // 样例类： LoginEvent( userId: Long, ip: String, status: String, eventTime: Long )
   lazy val loginFailListsState: ListState[LoginEvent] = getRuntimeContext.getListState(new ListStateDescriptor[LoginEvent]("loginFailList-state", classOf[LoginEvent]))
 
+  // value: 输入
   override def processElement(value: LoginEvent, ctx: KeyedProcessFunction[Long, LoginEvent, Warning]#Context, out: Collector[Warning]): Unit = {
     // 按照status筛选失败的事件，如果成功状态清空
     if( value.status == "fail" ){

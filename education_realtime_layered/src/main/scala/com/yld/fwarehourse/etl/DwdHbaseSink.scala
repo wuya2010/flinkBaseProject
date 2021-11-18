@@ -1,6 +1,6 @@
 
 
-import com.atguigu.education.model.GlobalConfig
+import com.alibaba.education.model.GlobalConfig
 import com.google.gson.Gson
 import main.scala.com.yld.fwarehourse.bean.{BaseAd, BaseViplevel, BaseWebSite, TopicAndValue}
 import org.apache.flink.configuration.Configuration

@@ -1,4 +1,4 @@
-package com.atguigu.education.model
+package com.alibaba.education.model
 
 //fixme: hbase 相关
 object GlobalConfig {

@@ -1,19 +1,19 @@
-package com.atguigu.apitest.sinkTest
+package com.alibaba.apitest.sinkTest
 
-import com.atguigu.apitest.SensorReading
+import com.alibaba.apitest.SensorReading
 import org.apache.flink.streaming.api.scala._
 import org.apache.flink.streaming.connectors.redis.RedisSink
 import org.apache.flink.streaming.connectors.redis.common.config.FlinkJedisPoolConfig
 import org.apache.flink.streaming.connectors.redis.common.mapper.{RedisCommand, RedisCommandDescription, RedisMapper}
 
 /**
-  * Copyright (c) 2018-2028 尚硅谷 All Rights Reserved 
+  *
   *
   * Project: FlinkTutorial
   * Package: com.atguigu.apitest.sinkTest
   * Version: 1.0
   *
-  * Created by wushengran on 2019/10/19 16:14
+  *  2019/10/19 16:14
   */
 object RedisSinkTest {
   def main(args: Array[String]): Unit = {
@@ -25,7 +25,7 @@ object RedisSinkTest {
       .setPort(6379)
       .build()
 
-    val inputStream = env.readTextFile("D:\\Projects\\BigData\\FlinkTutorial\\src\\main\\resources\\sensor.txt")
+    val inputStream = env.readTextFile("E:\\WORKS\\Mine\\flinkBaseProject\\flinkBase\\src\\main\\resources\\sensor.txt")
 
     val dataStream = inputStream
       .map(data => {

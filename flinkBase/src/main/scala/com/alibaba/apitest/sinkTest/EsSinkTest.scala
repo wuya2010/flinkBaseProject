@@ -1,8 +1,8 @@
-package com.atguigu.apitest.sinkTest
+package com.alibaba.apitest.sinkTest
 
 import java.util
 
-import com.atguigu.apitest.SensorReading
+import com.alibaba.apitest.SensorReading
 import org.apache.flink.api.common.functions.RuntimeContext
 import org.apache.flink.streaming.api.scala._
 import org.apache.flink.streaming.connectors.elasticsearch.{ElasticsearchSinkFunction, RequestIndexer}
@@ -11,13 +11,13 @@ import org.apache.http.HttpHost
 import org.elasticsearch.client.Requests
 
 /**
-  * Copyright (c) 2018-2028 尚硅谷 All Rights Reserved 
+  *
   *
   * Project: FlinkTutorial
   * Package: com.atguigu.apitest.sinkTest
   * Version: 1.0
   *
-  * Created by wushengran on 2019/10/19 16:30
+  *  2019/10/19 16:30
   */
 object EsSinkTest {
   def main(args: Array[String]): Unit = {
@@ -36,7 +36,7 @@ object EsSinkTest {
           sourceData.put("sensor_id", element.id)
           sourceData.put("temperature", element.temperature.toString)
           sourceData.put("ts", element.timestamp.toString)
-          // 创建一个index request
+          // 创建一个index request source 为一个map
           val indexRequest = Requests.indexRequest().index("sensor").`type`("readingData").source(sourceData)
           // 用indexer发送请求
           indexer.add(indexRequest)
@@ -44,7 +44,8 @@ object EsSinkTest {
         }
       })
 
-    val inputStream = env.readTextFile("D:\\Projects\\BigData\\FlinkTutorial\\src\\main\\resources\\sensor.txt")
+    val inputStream = env.readTextFile("E:\\WORKS\\Mine\\flinkBaseProject\\flinkBase\\src\\main\\resources\\sensor.txt")
+
 
     val dataStream = inputStream
       .map(data => {

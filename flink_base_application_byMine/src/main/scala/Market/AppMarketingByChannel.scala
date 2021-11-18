@@ -74,6 +74,7 @@ object AppMarketingByChannel {
   }
 }
 
+// [IN, OUT, KEY, W <: Window]
 class MarketingCountByChannel() extends ProcessWindowFunction[((String, String), Long), MarketingViewCount, (String, String), TimeWindow]{
   override def process(key: (String, String), context: Context, elements: Iterable[((String, String), Long)], out: Collector[MarketingViewCount]): Unit = {
     val startTs = new Timestamp( context.window.getStart )

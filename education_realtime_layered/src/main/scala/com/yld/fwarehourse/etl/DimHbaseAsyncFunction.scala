@@ -4,8 +4,7 @@ import java.util.Collections
 import java.util.concurrent.{ExecutorService, Executors, TimeUnit}
 
 import com.alibaba.fastjson.JSONObject
-import com.atguigu.education.model.GlobalConfig
-import com.atguigu.education.util.ParseJsonData
+import com.alibaba.education.model.GlobalConfig
 import com.google.common.cache.{Cache, CacheBuilder}
 import com.yld.fwarehourse.util.ParseJsonData
 import org.apache.flink.configuration.Configuration

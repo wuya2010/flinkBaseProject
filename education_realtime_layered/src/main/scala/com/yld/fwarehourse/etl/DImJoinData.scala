@@ -2,8 +2,7 @@ import java.lang
 import java.util.Properties
 
 import com.alibaba.fastjson.JSONObject
-import com.atguigu.education.model._
-import com.atguigu.education.util.ParseJsonData
+import com.alibaba.education.model._
 import com.yld.fwarehourse.util.ParseJsonData
 import main.scala.com.yld.fwarehourse.bean.{DwdMember, DwdMemberPayMoney, DwdMemberRegtype}
 import org.apache.flink.api.common.functions.CoGroupFunction

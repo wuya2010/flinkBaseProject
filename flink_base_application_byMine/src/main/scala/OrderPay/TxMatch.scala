@@ -55,7 +55,7 @@ object TxMatch {
     env.execute("tx match job")
   }
 
-  // 自定义CoProcessFunction
+  // 自定义CoProcessFunction ==> <IN1, IN2, OUT>
   class TxPayMatch() extends CoProcessFunction[OrderEvent, ReceiptEvent, (OrderEvent, ReceiptEvent)]{
     // 定义状态，用于保存已经来的事件
     lazy val payState: ValueState[OrderEvent] = getRuntimeContext.getState(new ValueStateDescriptor[OrderEvent]("pay-state", classOf[OrderEvent]))

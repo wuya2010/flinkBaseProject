@@ -43,6 +43,9 @@ object LoginFailWithCep {
     // 3. 将模式应用到数据流上
     val patternStream = CEP.pattern(dataStream, loginFailPattern)
 
+    //获取最终结果
+
+
     env.execute("login fail with cep job")
   }
 }

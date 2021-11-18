@@ -1,16 +1,16 @@
-package com.atguigu.wc
+package com.alibaba.wc
 
 import org.apache.flink.api.java.utils.ParameterTool
 import org.apache.flink.streaming.api.scala._
 
 /**
-  * Copyright (c) 2018-2028 尚硅谷 All Rights Reserved 
+  *
   *
   * Project: FlinkTutorial
   * Package: com.atguigu.wc
   * Version: 1.0
   *
-  * Created by wushengran on 2019/10/18 11:36
+  *  2019/10/18 11:36
   */
 
 // 流处理word count程序

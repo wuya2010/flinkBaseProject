@@ -14,13 +14,13 @@ import scala.util.MurmurHash
 import scala.util.hashing.MurmurHash3
 
 /**
-  * Copyright (c) 2018-2028 尚硅谷 All Rights Reserved 
+  *
   *
   * Project: UserBehaviorAnalysis
   * Package: com.atguigu.networkflow_analysis
   * Version: 1.0
   *
-  * Created by wushengran on 2019/10/25 11:46
+  *  2019/10/25 11:46
   */
 object UvWithBloom {
   def main(args: Array[String]): Unit = {

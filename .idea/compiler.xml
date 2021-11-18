@@ -6,9 +6,11 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="flink_base_application_byMine" />
         <module name="education_realtime_layered" />
-        <module name="flink_base_application" />
         <module name="flinkBase" />
+        <module name="flink_base_application" />
+        <module name="flink_batch2Stream" />
       </profile>
     </annotationProcessing>
   </component>

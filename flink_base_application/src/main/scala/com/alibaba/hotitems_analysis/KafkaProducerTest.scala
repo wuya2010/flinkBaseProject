@@ -5,13 +5,13 @@ import java.util.Properties
 import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord}
 
 /**
-  * Copyright (c) 2018-2028 尚硅谷 All Rights Reserved 
+  *
   *
   * Project: UserBehaviorAnalysis
   * Package: com.atguigu.hotitems_analysis
   * Version: 1.0
   *
-  * Created by wushengran on 2019/10/24 16:09
+  *  2019/10/24 16:09
   */
 object KafkaProducerTest {
   def main(args: Array[String]): Unit = {

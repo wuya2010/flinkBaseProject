@@ -1,4 +1,4 @@
-package com.atguigu.apitest
+package com.alibaba.apitest
 
 import org.apache.flink.api.common.functions.RichFlatMapFunction
 import org.apache.flink.api.common.state.{ValueState, ValueStateDescriptor}
@@ -18,7 +18,7 @@ object ProcessFunctionTest {
     //    env.setStreamTimeCharacteristic(TimeCharacteristic.ProcessingTime)
 
     //    val inputStream = env.socketTextStream("localhost", 7777)
-    val inputStream = env.readTextFile("F:\\03. Codes\\03-实时分析\\02-Flink\\01-IDEA\\FlinkTutorial\\src\\main\\resources\\sensor.txt")
+    val inputStream = env.readTextFile("E:\\WORKS\\Mine\\flinkBaseProject\\flinkBase\\src\\main\\resources\\sensor.txt")
 
 
     val dataStream = inputStream
@@ -37,15 +37,17 @@ object ProcessFunctionTest {
       //fixme: keyStream
       .process(new TempIncreseWarning())
 
-    warningStream.print()
+    warningStream.print("process")
+
+
 
     // 2. 低温冰点报警：基于时间相关
     val freezingMonitorStream = dataStream
       .process(new FreezingMonitor())
 
-//    freezingMonitorStream.print()
+    freezingMonitorStream.print("freezing")
     //输出侧输出流
-//    freezingMonitorStream.getSideOutput(new OutputTag[(String, String)]("freezing-warning")).print()
+    freezingMonitorStream.getSideOutput(new OutputTag[(String, String)]("freezing-warning")).print("side")
 
 
     // 3. 温度跳变报警
@@ -87,7 +89,7 @@ class TempIncreseWarning() extends KeyedProcessFunction[String, SensorReading, S
   lazy val currentTimer: ValueState[Long] = getRuntimeContext.getState(new ValueStateDescriptor[Long]("currentTimer-state", Types.of[Long]))
 
   override def onTimer(timestamp: Long, ctx: KeyedProcessFunction[String, SensorReading, String]#OnTimerContext, out: Collector[String]): Unit = {
-    out.collect("sensor " + ctx.getCurrentKey + "温度10秒内连续上升") //主流输出
+    out.collect("sensor " + ctx.getCurrentKey + "温度5秒内连续上升") //主流输出
     currentTimer.clear()
   }
 
@@ -96,8 +98,6 @@ class TempIncreseWarning() extends KeyedProcessFunction[String, SensorReading, S
     // 取出上一次的温度值
     val prevTemp = lastTemp.value()
     lastTemp.update(value.temperature)  //赋值新的值给lastTemp
-
-//    我的工作是一名高级数据分析师，这是一个令我头疼欲裂，狂掉头发的工作，我天天起早贪黑废寝忘食的搞学习，就是为了成为一名高级的架构师，这是我的终极目标。
 
     val curTimerTs = currentTimer.value()  //当前的时间闹钟
 

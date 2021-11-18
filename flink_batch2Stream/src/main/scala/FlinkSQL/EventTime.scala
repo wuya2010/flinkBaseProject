@@ -20,7 +20,7 @@ object EventTime {
     //SteamTableEnvironment
     val TableEnv = StreamTableEnvironment.create(env)
 
-    val inputStream: DataStream[String] = env.readTextFile("E:\\01_myselfProject\\Base\\spark_flink_project\\flink_streaming\\src\\main\\resources\\sensor.txt")
+    val inputStream: DataStream[String] = env.readTextFile("E:\\WORKS\\Mine\\flinkBaseProject\\flink_batch2Stream\\src\\main\\resources\\sensor.txt")
     val dataStream: DataStream[SensorReading] = inputStream
       .map(data => {
         val dataArray = data.split(",").map(x=>x.trim)
@@ -33,7 +33,7 @@ object EventTime {
     //1. 根据 DataStream 转化成 Table 时指定
     val resultTable =  TableEnv.fromDataStream(dataStream,"id","timestamp".rowtime,"temperature")
 
-    //2. 直接追加字段
+    //2. 直接追加字段 fixme:  rowtime 是什么？
     val resultTable2 = TableEnv.fromDataStream(dataStream,"id","temperature","timestamp","rt".rowtime)
 
     //3. 定义TableSchema指定
@@ -56,8 +56,8 @@ object EventTime {
 
 
     //4. 创建ddl指定
-    // 这里FROM_UNIXTIME是系统内置的时间函数，用来将一个整数（秒数）转换成“YYYY-MM-DD hh:mm:ss”格式
-    // TO_TIMESTAMP将其转换成Timestamp
+    // 这里 FROM_UNIXTIME 是系统内置的时间函数，用来将一个整数（秒数）转换成“YYYY-MM-DD hh:mm:ss”格式
+    // TO_TIMESTAMP 将其转换成 Timestamp
     val sinkDDL: String =
       """
         |create table dataTable (

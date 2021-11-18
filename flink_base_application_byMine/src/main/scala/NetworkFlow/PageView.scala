@@ -26,6 +26,7 @@ object PageView {
       .filter(_.behavior == "pv")
       .map( data => ("pv", 1) )
       .keyBy(_._1)
+      //与 timeWindowAll 的关系
       .timeWindow( Time.hours(1) )    // 设置1小时滚动窗口
       .sum(1)
       .print()

@@ -7,13 +7,13 @@ import org.apache.flink.streaming.api.scala._
 import org.apache.flink.util.Collector
 
 /**
-  * Copyright (c) 2018-2028 尚硅谷 All Rights Reserved 
+  *
   *
   * Project: UserBehaviorAnalysis
   * Package: com.atguigu.orderpay_detect
   * Version: 1.0
   *
-  * Created by wushengran on 2019/10/28 14:16
+  *  2019/10/28 14:16
   */
 
 // 定义到账信息样例类

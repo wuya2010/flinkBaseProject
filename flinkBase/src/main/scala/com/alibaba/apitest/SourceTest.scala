@@ -1,4 +1,4 @@
-package com.atguigu.apitest
+package com.alibaba.apitest
 
 import java.util.Properties
 
@@ -10,13 +10,13 @@ import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer011
 import scala.util.Random
 
 /**
-  * Copyright (c) 2018-2028 尚硅谷 All Rights Reserved 
+  *
   *
   * Project: FlinkTutorial
   * Package: com.atguigu.apitest
   * Version: 1.0
   *
-  * Created by wushengran on 2019/10/19 10:18
+  *  2019/10/19 10:18
   */
 
 // 测试source
@@ -37,7 +37,7 @@ object SourceTest {
     ) )
 //    env.fromElements(1, 0.34, "data")
     // 2. 从文件读取数据
-    val stream2 = env.readTextFile("D:\\Projects\\BigData\\FlinkTutorial\\src\\main\\resources\\sensor.txt")
+    val stream2 = env.readTextFile("E:\\WORKS\\Mine\\flinkBaseProject\\flinkBase\\src\\main\\resources\\sensor.txt")
 
     // 3. 从kafka读取数据
     // 定义相关的配置

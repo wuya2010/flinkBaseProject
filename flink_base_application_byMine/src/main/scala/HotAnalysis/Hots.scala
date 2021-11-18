@@ -25,7 +25,7 @@ object Hots {
   def main(args: Array[String]): Unit = {
     val env = StreamExecutionEnvironment.getExecutionEnvironment
     env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
-    env.setParallelism(1)
+    env.setParallelism(5)
 
     /*  val properties = new Properties()
       properties.setProperty("bootstrap.servers", "localhost:9092")
@@ -37,19 +37,23 @@ object Hots {
     // 读取数据
     // val inputStream = env.readTextFile("D:\\Projects\\BigData\\UserBehaviorAnalysis\\HotItemsAnalysis\\src\\main\\resources\\UserBehavior.csv")
     //val inputStream = env.addSource(new FlinkKafkaConsumer[String]("hotitems", new SimpleStringSchema(), properties))
-    val inputStream = env.socketTextStream("hadoop102",7777)
+
+    // 543462,1715,1464116,pv,1511658000
+
+    val inputStream = env.socketTextStream("192.168.25.229",7777)
       .map(data => {
         val dataArray = data.split(",")
+        //UserBehavior(userId: Long, itemId: Long, categoryId: Int, behavior: String, timestamp: Long
         UserBehavior(dataArray(0).toLong, dataArray(1).toLong, dataArray(2).toInt, dataArray(3), dataArray(4).toLong)
       })
-      //增加时间标记
+      //增加时间标记, 创建 watermark
       .assignAscendingTimestamps(_.timestamp * 1000L)
 
-    // 对数据进行窗口聚合处理
+    // 对数据进行窗口聚合处理, fixme: 输出值类型： temId: Long,  windowEnd: Long,  count: Long
     val aggStream: DataStream[ItemViewCount] = inputStream
       .filter(_.behavior == "pv") // 过滤出pv数据
-      .keyBy(_.itemId)//对商品进行分组
-      .timeWindow(Time.hours(1), Time.minutes(5)) // 开窗进行统计
+      .keyBy(_.itemId)//对商品进行分组 , 各分区数据在同一个 task 中
+      .timeWindow(Time.hours(1), Time.seconds(30)) // 开窗进行统计， 基于哪个参数进行开窗
       .aggregate(new CountAgg(), new WindowCountResult()) // 聚合出当前商品在时间窗口内的统计数量
 
     // 对聚合结果按照窗口分组，并排序
@@ -73,7 +77,7 @@ case class UserBehavior(userId: Long, itemId: Long, categoryId: Int, behavior: S
 case class ItemViewCount(itemId: Long, windowEnd: Long,count: Long)
 
 
-// 自定义的预聚合函数，来一条数据就加一
+// 自定义的预聚合函数，来一条数据就加一 <IN, ACC, OUT>
 class CountAgg() extends AggregateFunction[UserBehavior, Long, Long] {
   override def add(value: UserBehavior, accumulator: Long): Long = accumulator + 1
 
@@ -100,7 +104,7 @@ class MyAverageAgg() extends AggregateFunction[Long, (Long, Int), Double] {
 
 
 
-// 自定义window function
+// 自定义window function  ==> IN, OUT, KEY, W <: Window]
 class WindowCountResult() extends WindowFunction[Long, ItemViewCount, Long, TimeWindow] {
   //  override def apply(key: Tuple, window: TimeWindow, input: Iterable[Long], out: Collector[ItemViewCount]): Unit = {
   //  val itemId = key.asInstanceOf[Tuple1[Long]].f0
@@ -121,7 +125,7 @@ class WindowCountResult() extends WindowFunction[Long, ItemViewCount, Long, Time
 //实现： 1. 以窗口大小为聚合时间，对窗口内数据进行初聚合；
 //2. 利用 keyProcessFunction 函数对分组后的数据，获取top数据
 //3. 根据窗口设置注册时间
-//4. 在满足时间触发条件后，对数据进行逻辑处理
+//4. 在满足时间触发条件后，对数据进行逻辑处理  <K, I, O>
 class TopNHotItems(topSize: Int) extends KeyedProcessFunction[Long, ItemViewCount, String] {
   // 定义一个列表状态，用于保存所有的商品个数统计值
   private var itemListState: ListState[ItemViewCount] = _
@@ -130,12 +134,15 @@ class TopNHotItems(topSize: Int) extends KeyedProcessFunction[Long, ItemViewCoun
     itemListState = getRuntimeContext.getListState(new ListStateDescriptor[ItemViewCount]("itemList-state", classOf[ItemViewCount]))
   }
 
+  // 流中的每一个元素都会调用这个方法，调用结果将会放在Collector 数据类型中输
   override def processElement(value: ItemViewCount, ctx: KeyedProcessFunction[Long, ItemViewCount, String]#Context, out: Collector[String]): Unit = {
     // 每来一条数据，就保存入list state，注册一个定时器
     itemListState.add(value)
     ctx.timerService().registerEventTimeTimer(value.windowEnd)
   }
 
+  // 到达触发时间: 参数timestamp为定时器所设定的触发的时间戳
+  // OnTimerContext和processElement的Context参数一样，提供了上下文的一些信息
   override def onTimer(timestamp: Long, ctx: KeyedProcessFunction[Long, ItemViewCount, String]#OnTimerContext, out: Collector[String]): Unit = {
     // 先将所有数据从状态中取出
     val allItems: ListBuffer[ItemViewCount] = ListBuffer()
@@ -152,7 +159,7 @@ class TopNHotItems(topSize: Int) extends KeyedProcessFunction[Long, ItemViewCoun
     val results: StringBuilder = new StringBuilder()
     results.append("时间：").append(new Timestamp(timestamp)).append("\n")
     // 对排序的数据遍历输出
-    for (i <- sortedItems.indices) {//相当于  sortedItems.length -1  获取下角标
+    for (i <- sortedItems.indices) {//相当于  sortedItems.length -1  获取下角标 fixme: sortedItems.indices
       val currentItem = sortedItems(i)
       results.append("No").append(i + 1).append(":")
         .append(" 商品ID=").append(currentItem.itemId)

@@ -43,7 +43,8 @@ object OrderTimeout {
 
     // 4. 用select方法获取匹配到的事件序列，并做处理
     val orderTimeoutOutputTag = new OutputTag[OrderResult]("orderTimeout")
-    val resultStream = patternStream.select( orderTimeoutOutputTag,
+    val resultStream = patternStream
+      .select( orderTimeoutOutputTag,
       new OrderTimeOutSelect(),
       new OrderPaySelect())
 

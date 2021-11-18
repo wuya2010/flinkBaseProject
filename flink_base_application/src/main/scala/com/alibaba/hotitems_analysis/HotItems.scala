@@ -20,13 +20,13 @@ import org.apache.flink.util.Collector
 import scala.collection.mutable.ListBuffer
 
 /**
-  * Copyright (c) 2018-2028 尚硅谷 All Rights Reserved 
+  *
   *
   * Project: UserBehaviorAnalysis
   * Package: com.atguigu.hotitems_analysis
   * Version: 1.0
   *
-  * Created by wushengran on 2019/10/24 14:23
+  *  2019/10/24 14:23
   */
 
 // 输入用户行为数据样例类

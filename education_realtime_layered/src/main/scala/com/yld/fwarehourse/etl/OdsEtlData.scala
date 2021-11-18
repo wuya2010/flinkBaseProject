@@ -1,9 +1,9 @@
-package com.atguigu.education.etl
+package com.alibaba.education.etl
 
 import java.util.Properties
 
 import com.alibaba.fastjson.JSONObject
-import com.atguigu.education.model.{DwdKafkaProducerSerializationSchema, GlobalConfig, TopicAndValueDeserializationSchema}
+import com.alibaba.education.model.{DwdKafkaProducerSerializationSchema, GlobalConfig, TopicAndValueDeserializationSchema}
 import com.yld.fwarehourse.util.ParseJsonData
 import main.scala.com.yld.fwarehourse.bean.TopicAndValue
 import org.apache.flink.api.common.restartstrategy.RestartStrategies
@@ -74,7 +74,7 @@ object OdsEtlData {
     //todo: 将dataStream拆成两份 一份维度表写到hbase 另一份事实表数据写到第二层kafka
     val sideOutHbaseTag = new OutputTag[TopicAndValue]("hbaseSinkStream")
     //    val sideOutGreenPlumTag = new OutputTag[TopicAndValue]("greenplumSinkStream")
-    val result = dataStream.process(new ProcessFunction[TopicAndValue, TopicAndValue] { //【I,O】： 输入输出类型
+    val result = dataStream.process(new ProcessFunction[TopicAndValue, TopicAndValue] { //参数类型： 【I,O】： 输入输出类型
       override def processElement(value: TopicAndValue, ctx: ProcessFunction[TopicAndValue, TopicAndValue]#Context, out: Collector[TopicAndValue]): Unit = {
         value.topic match {
             //todo:  the side output identified 测输出流
@@ -85,9 +85,15 @@ object OdsEtlData {
     })
     //侧输出流得到 需要写入hbase的数据
     //        result.getSideOutput(sideOutGreenPlumTag).addSink(new DwdGreenPlumSink)
-    result.getSideOutput(sideOutHbaseTag).addSink(new DwdHbaseSink) // 侧输出流从 hbase 流出
+
+//    result.getSideOutput(sideOutHbaseTag).addSink(new DwdHbaseSink) // 侧输出流从 hbase 流出
+
     //    //事实表数据写入第二层kafka： 2 层 kafka
     result.addSink(new FlinkKafkaProducer010[TopicAndValue](GlobalConfig.BOOTSTRAP_SERVERS, "", new DwdKafkaProducerSerializationSchema))//自定义：序列化类
     env.execute()
+  }
+
+  class DwdHbaseSink(){
+
   }
 }

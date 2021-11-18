@@ -1,4 +1,4 @@
-package com.atguigu.education.model
+package com.alibaba.education.model
 
 import java.nio.charset.Charset
 
@@ -9,6 +9,7 @@ import org.apache.flink.streaming.util.serialization.KeyedSerializationSchema
 //fixme: 为什么要序列化
 
 class DwdKafkaProducerSerializationSchema extends KeyedSerializationSchema[TopicAndValue] {
+
   val serialVersionUID = 1351665280744549933L;
 
   override def serializeKey(element: TopicAndValue): Array[Byte] = null //key置1空

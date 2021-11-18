@@ -1,17 +1,17 @@
-package com.atguigu.apitest
+package com.alibaba.apitest
 
 import org.apache.flink.api.common.functions.{FilterFunction, RichMapFunction}
 import org.apache.flink.configuration.Configuration
 import org.apache.flink.streaming.api.scala._
 
-// 转换算子测试
+// 转换算子测试, 了解的流的状态
 
 object TransformTest {
   def main(args: Array[String]): Unit = {
     val env = StreamExecutionEnvironment.getExecutionEnvironment
     env.setParallelism(1)
 
-    val inputStream = env.readTextFile("F:\\03. Codes\\03-实时分析\\02-Flink\\01-IDEA\\FlinkTutorial\\src\\main\\resources\\sensor.txt")
+    val inputStream = env.readTextFile("E:\\WORKS\\Mine\\flinkBaseProject\\flinkBase\\src\\main\\resources\\sensor.txt")
 
 //    val inputStream = env.socketTextStream("localhost", 7777)
     // 1. 简单转换和滚动聚合算子测试
@@ -28,7 +28,7 @@ object TransformTest {
 //      .reduce((x, y) => SensorReading(x.id, x.timestamp + 1, y.temperature + 10))
       .min("temperature")
 
-//    aggStream.print()
+    aggStream.print("min")
 
 
 
@@ -48,7 +48,7 @@ object TransformTest {
     // 3. 合并两条流
     val warningStream = highTempStream.map( data => (data.id, data.temperature) )
     //fixme: 连接 2 个 不同类型的流  different type
-    val connectedStreams = warningStream.connect(lowTempStream)
+    val connectedStreams: ConnectedStreams[(String, Double), SensorReading] = warningStream.connect(lowTempStream)
 
     //fixme:将2个流合并的流拆分
     val coMapStream = connectedStreams.map(

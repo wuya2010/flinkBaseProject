@@ -1,27 +1,27 @@
-package com.atguigu.apitest.sinkTest
+package com.alibaba.apitest.sinkTest
 
 import java.sql.{Connection, DriverManager, PreparedStatement}
 
-import com.atguigu.apitest.SensorReading
+import com.alibaba.apitest.SensorReading
 import org.apache.flink.configuration.Configuration
 import org.apache.flink.streaming.api.functions.sink.{RichSinkFunction, SinkFunction}
 import org.apache.flink.streaming.api.scala._
 
 /**
-  * Copyright (c) 2018-2028 尚硅谷 All Rights Reserved 
+  *
   *
   * Project: FlinkTutorial
   * Package: com.atguigu.apitest.sinkTest
   * Version: 1.0
   *
-  * Created by wushengran on 2019/10/19 16:48
+  *  2019/10/19 16:48
   */
 object JdbcSinkTest {
   def main(args: Array[String]): Unit = {
     val env = StreamExecutionEnvironment.getExecutionEnvironment
     env.setParallelism(1)
 
-    val inputStream = env.readTextFile("D:\\Projects\\BigData\\FlinkTutorial\\src\\main\\resources\\sensor.txt")
+    val inputStream = env.readTextFile("E:\\WORKS\\Mine\\flinkBaseProject\\flinkBase\\src\\main\\resources\\sensor.txt")
 
     val dataStream = inputStream
       .map(data => {
@@ -29,6 +29,7 @@ object JdbcSinkTest {
         SensorReading(dataArray(0).trim, dataArray(1).trim.toLong, dataArray(2).trim.toDouble)
       })
 
+    // 数据写入本地mysql
     dataStream.addSink( new MyJdbcSink() )
 
     dataStream.print()

@@ -53,6 +53,7 @@ object NetworkFlow {
       .allowedLateness(Time.minutes(1))    // 允许迟到数据叠加到窗口聚合结果上
       .aggregate( new CountAgg(), new UrlCountResult() )
 
+    //输出结果
     val processedStream = aggStream
       .keyBy(_.windowEnd)
       .process( new TopNHotUrls(5) )
@@ -65,7 +66,7 @@ object NetworkFlow {
   }
 }
 
-// 自定义预聚合函数
+// 自定义预聚合函数 <IN, ACC, OUT>
 class CountAgg() extends AggregateFunction[ApacheLogEvent, Long, Long]{
   override def add(value: ApacheLogEvent, accumulator: Long): Long = accumulator + 1
 
@@ -75,7 +76,7 @@ class CountAgg() extends AggregateFunction[ApacheLogEvent, Long, Long]{
 
   override def merge(a: Long, b: Long): Long = a + b
 }
-// 自定义窗口函数
+// 自定义窗口聚合函数
 class UrlCountResult() extends WindowFunction[Long, UrlViewCount, String, TimeWindow]{
   override def apply(key: String, window: TimeWindow, input: Iterable[Long], out: Collector[UrlViewCount]): Unit = {
     out.collect( UrlViewCount( key, window.getEnd, input.iterator.next() ) )
@@ -96,7 +97,7 @@ class TopNHotUrls(topSize: Int) extends KeyedProcessFunction[Long, UrlViewCount,
 //    for( urlViewCount <- urlListState.get() ){
 //      allUrlViewCounts += urlViewCount
 //    }
-    val iter = urlMapState.entries().iterator()
+    val iter = urlMapState.entries().iterator() // urlMapState 数据类型： MapState[String,Long]
     while( iter.hasNext ){
       val entry = iter.next()
       allUrlViewCounts += ( ( entry.getKey, entry.getValue ) )

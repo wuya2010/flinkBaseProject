@@ -1,4 +1,4 @@
-package com.atguigu.education.model
+package com.alibaba.education.model
 
 import main.scala.com.yld.fwarehourse.bean.TopicAndValue
 import org.apache.flink.api.common.typeinfo.{TypeHint, TypeInformation}

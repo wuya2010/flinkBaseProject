@@ -1,4 +1,4 @@
-package com.atguigu.apitest
+package com.alibaba.apitest
 
 import org.apache.flink.contrib.streaming.state.RocksDBStateBackend
 import org.apache.flink.runtime.state.filesystem.FsStateBackend
@@ -13,22 +13,25 @@ import org.apache.flink.streaming.api.windowing.assigners.{SlidingEventTimeWindo
 import org.apache.flink.streaming.api.windowing.time.Time
 
 /**
-  * Copyright (c) 2018-2028 尚硅谷 All Rights Reserved 
+  *
   *
   * Project: FlinkTutorial
   * Package: com.atguigu.apitest
   * Version: 1.0
   *
-  * Created by wushengran on 2019/10/21 10:19
+  *  2019/10/21 10:19
   */
 object WindowTest {
   def main(args: Array[String]): Unit = {
     val env = StreamExecutionEnvironment.getExecutionEnvironment
     env.setParallelism(1)
     env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
+
     env.getConfig.setAutoWatermarkInterval(300L)
     env.enableCheckpointing(60000L)
+
     env.getCheckpointConfig.setCheckpointingMode(CheckpointingMode.EXACTLY_ONCE)
+
     env.getCheckpointConfig.setCheckpointTimeout(90000L)
 //    env.getCheckpointConfig.setMaxConcurrentCheckpoints(2)
     env.getCheckpointConfig.setMinPauseBetweenCheckpoints(10000L)
@@ -36,7 +39,7 @@ object WindowTest {
     env.getCheckpointConfig.enableExternalizedCheckpoints(ExternalizedCheckpointCleanup.RETAIN_ON_CANCELLATION)
 //    env.setStateBackend(new RocksDBStateBackend(""))
 
-    val inputStream = env.readTextFile("F:\\03. Codes\\03-实时分析\\02-Flink\\01-IDEA\\FlinkTutorial\\src\\main\\resources\\sensor.txt")
+    val inputStream = env.readTextFile("E:\\WORKS\\Mine\\flinkBaseProject\\flinkBase\\src\\main\\resources\\sensor.txt")
 
 //    val inputStream = env.socketTextStream("localhost", 7777)
 
@@ -51,13 +54,14 @@ object WindowTest {
       .assignTimestampsAndWatermarks( new BoundedOutOfOrdernessTimestampExtractor[SensorReading](Time.milliseconds(2500)) {
       override def extractTimestamp(element: SensorReading): Long = element.timestamp * 1000L
     } )
-//      .assignTimestampsAndWatermarks( new MyAssigner() )
+    // 自定义一个 watermark
+    //      .assignTimestampsAndWatermarks( new MyAssigner() )
 
     val outputTag = new OutputTag[SensorReading]("side")  //侧输出流
 
 
 
-    // 每个传感器每隔15秒输出这段时间内的最小值
+    // 每个传感器每隔15秒输出这段时间内的最小值---对窗口内数据？？？
     val minTempPerWindowStream = dataStream
       .keyBy(_.id)
 //      .timeWindow(Time.seconds(15))  //fixme: 与 window 的区别是什么?

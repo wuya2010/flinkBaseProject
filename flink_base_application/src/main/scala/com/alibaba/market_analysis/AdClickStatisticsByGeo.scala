@@ -41,8 +41,8 @@ object AdClickStatisticsByGeo {
 
     // 添加黑名单过滤的逻辑
     val filterBlackListStream = adClickEventStream
-      .keyBy( data => (data.userId, data.adId) )
-      .process( new FilterBlackListUser(100) )
+      .keyBy( data => (data.userId, data.adId))
+      .process( new FilterBlackListUser(100))
 
     // 进行开窗聚合统计
     val adCountStream = filterBlackListStream

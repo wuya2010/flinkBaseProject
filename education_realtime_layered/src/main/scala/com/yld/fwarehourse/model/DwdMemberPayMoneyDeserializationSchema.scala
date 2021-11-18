@@ -1,4 +1,4 @@
-package com.atguigu.education.model
+package com.alibaba.education.model
 
 import com.google.gson.Gson
 import main.scala.com.yld.fwarehourse.bean.DwdMemberPayMoney

@@ -25,7 +25,7 @@ object AdClickStatisticsByGeo {
 
   def main(args: Array[String]): Unit = {
     val env = StreamExecutionEnvironment.getExecutionEnvironment
-    env.setParallelism(1)
+    env.setParallelism(1)  //分区如何实现
     env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
 
     // 读取数据源
@@ -38,7 +38,7 @@ object AdClickStatisticsByGeo {
       } )
       .assignAscendingTimestamps(_.timestamp * 1000L)//周期性生成时间戳
 
-    // 添加黑名单过滤的逻辑
+    // fixme: 添加黑名单过滤的逻辑
     val filterBlackListStream = adClickEventStream
       .keyBy( data => (data.userId, data.adId) )
       .process( new FilterBlackListUser(100) )
@@ -110,7 +110,7 @@ class CountAgg() extends AggregateFunction[AdClickEvent, Long, Long]{
   override def merge(a: Long, b: Long): Long = a + b
 }
 
-// 自定义窗口函数
+// 自定义窗口函数 [IN, OUT, KEY, W <: Window]
 class AdCountResult() extends WindowFunction[Long, AdCountByProvince, String, TimeWindow]{
   override def apply(key: String, window: TimeWindow, input: Iterable[Long], out: Collector[AdCountByProvince]): Unit = {
     val windowEnd = new Timestamp(window.getEnd).toString

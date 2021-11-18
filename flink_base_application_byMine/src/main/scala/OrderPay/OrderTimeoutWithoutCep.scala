@@ -36,7 +36,7 @@ object OrderTimeoutWithoutCep {
     env.execute("order timeout without cep job")
   }
 
-  // 自定义实现匹配和超时的处理函数
+  // 自定义实现匹配和超时的处理函数 <K, I, O>
   class OrderPayMatch() extends KeyedProcessFunction[Long, OrderEvent, OrderResult]{
     // 定义一个标记位，用于判断pay事件是否来过
     lazy val isPayedState: ValueState[Boolean] = getRuntimeContext.getState(new ValueStateDescriptor[Boolean]("isPayed-state", classOf[Boolean]))
