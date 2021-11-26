@@ -32,7 +32,7 @@ object func2 {
 
 
     // 定义好 DataStream
-    val inputStream: DataStream[String] = env.readTextFile("sensor.txt")
+    val inputStream: DataStream[String] = env.readTextFile("sensor.csv")
     val dataStream: DataStream[SensorReading] = inputStream
       .map(data => {
         val dataArray = data.split(",")

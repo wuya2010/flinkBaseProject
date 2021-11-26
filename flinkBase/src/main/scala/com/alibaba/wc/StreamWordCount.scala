@@ -22,11 +22,12 @@ object StreamWordCount {
 //    env.disableOperatorChaining()
 
     // 利用传入参数来指定hostname和port
-    val paramTool: ParameterTool = ParameterTool.fromArgs(args)
-    val host = paramTool.get("host")
-    val port = paramTool.getInt("port")
+//    val paramTool: ParameterTool = ParameterTool.fromArgs(args)
+//    val host = paramTool.get("host")
+//    val port = paramTool.getInt("port")
     // 接收一个socket文本流
-    val dataStream = env.socketTextStream(host, port)
+//    val dataStream = env.socketTextStream(host, port)
+    val dataStream = env.socketTextStream("192.168.25.229", 7777)
 
     // 对每条数据进行处理
     val wordCountDataStream = dataStream.flatMap(_.split(" "))
@@ -35,6 +36,13 @@ object StreamWordCount {
 //        .shuffle()
       .keyBy(0)
       .sum(1)
+
+    /**
+     * my na na
+     * na na
+     *
+     * 统计单词出现次数
+     */
 
     wordCountDataStream.print().setParallelism(1)
 

@@ -42,6 +42,7 @@ object NetworkFlow {
         override def extractTimestamp(element: ApacheLogEvent): Long = element.eventTime
       } )//不同的时间的处理
 
+    //83.149.9.216 - - 17/05/2015:10:05:07 +0000 GET /presentations/logstash-monitorama-2013/plugin/notes/notes.js
     val aggStream = inputStream
       .filter(_.method == "GET")
       .filter( data => {
@@ -108,6 +109,7 @@ class TopNHotUrls(topSize: Int) extends KeyedProcessFunction[Long, UrlViewCount,
 
     // 格式化输出
     val results: StringBuilder = new StringBuilder()
+    // timestamp 是什么
     results.append("时间：").append(new Timestamp(timestamp-1)).append("\n")
     // 对排序的数据遍历输出
     for (i <- sortedUrlViewCounts.indices) {

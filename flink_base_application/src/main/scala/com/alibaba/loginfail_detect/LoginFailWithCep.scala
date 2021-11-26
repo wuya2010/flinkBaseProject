@@ -20,7 +20,7 @@ object LoginFailWithCep {
     // 1. 读取数据源
     val resource = getClass.getResource("/LoginLog.csv")
     //    val dataStream = env.readTextFile(resource.getPath)
-    val dataStream = env.socketTextStream("localhost", 7777)
+    val dataStream = env.socketTextStream("192.168.25.229", 7777)
       .map(data => {
         val dataArray = data.split(",")
         LoginEvent(dataArray(0).toLong, dataArray(1), dataArray(2), dataArray(3).toLong)

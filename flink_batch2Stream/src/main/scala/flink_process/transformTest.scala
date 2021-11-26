@@ -15,7 +15,7 @@ object transformTest {
       env.setParallelism(1)
 
       //从端口读取
-      val inputStream = env.readTextFile("E:\\01_myselfProject\\spark_flink_project\\flink_streaming\\src\\main\\resources\\sensor.txt")
+      val inputStream = env.readTextFile("E:\\01_myselfProject\\spark_flink_project\\flink_streaming\\src\\main\\resources\\sensor.csv")
 
     val dataStream = inputStream
       .map(data => {

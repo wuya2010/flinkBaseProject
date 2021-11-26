@@ -20,7 +20,7 @@ object ProcessTime {
     //SteamTableEnvironment
     val TableEnv = StreamTableEnvironment.create(env)
 
-    val inputStream: DataStream[String] = env.readTextFile("E:\\01_myselfProject\\Base\\spark_flink_project\\flink_streaming\\src\\main\\resources\\sensor.txt")
+    val inputStream: DataStream[String] = env.readTextFile("E:\\WORKS\\Mine\\flinkBaseProject\\flink_batch2Stream\\src\\main\\resources\\sensor.txt")
     val dataStream: DataStream[SensorReading] = inputStream
       .map(data => {
         val dataArray = data.split(",").map(x=>x.trim)
@@ -38,7 +38,7 @@ object ProcessTime {
 
     //方式2：
     TableEnv.connect(
-      new FileSystem().path("sensor.txt"))
+      new FileSystem().path("sensor.csv"))
       .withFormat(new Csv())
       .withSchema(new Schema()
         .field("id", DataTypes.STRING())
@@ -61,7 +61,7 @@ object ProcessTime {
         |  pt AS PROCTIME()
         |) with (
         |  'connector.type' = 'filesystem',
-        |  'connector.path' = 'file:///D:\\..\\sensor.txt',
+        |  'connector.path' = 'file:///D:\\..\\sensor.csv',
         |  'format.type' = 'csv'
         |)
       """.stripMargin

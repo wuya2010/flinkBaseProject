@@ -14,7 +14,10 @@ object FlinkTableDemo {
 
     val env: StreamExecutionEnvironment = StreamExecutionEnvironment.getExecutionEnvironment
 
-    val inputStream: DataStream[String] = env.readTextFile("E:\\01_myselfProject\\Base\\spark_flink_project\\flink_streaming\\src\\main\\resources\\sensor.txt")
+//    val inputStream: DataStream[String] = env.readTextFile("E:\\WORKS\\Mine\\flinkBaseProject\\flink_batch2Stream\\src\\main\\resources\\sensor.csv")
+
+    val inputStream = env.socketTextStream("192.168.25.229", 7777)
+
     val dataStream: DataStream[SensorReading] = inputStream
       .map(data => {
         val dataArray: Array[String] = data.split(",")

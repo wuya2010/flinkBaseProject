@@ -57,7 +57,7 @@ object AdClickStatisticsByGeo {
 
 
 
-  // 实现自定义的process function
+  // 实现自定义的process function : 对连续点击事件进行处理
   // 实现： 过滤黑名单
   class FilterBlackListUser(maxCount: Int) extends KeyedProcessFunction[(Long, Long), AdClickEvent, AdClickEvent]{
     // 定义状态，保存用户对广告的点击量

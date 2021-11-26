@@ -20,7 +20,7 @@ object JdbcSink {
       env.setParallelism(1)
 
       //读取数据源
-      val inputStream =  env.readTextFile("E:\\01_myselfProject\\spark_flink_project\\flink_streaming\\src\\main\\resources\\sensor.txt")
+      val inputStream =  env.readTextFile("E:\\01_myselfProject\\spark_flink_project\\flink_streaming\\src\\main\\resources\\sensor.csv")
       //导包 import org.apache.flink.streaming.api.scala._
     val dataStream = inputStream.map(row => {
       val data = row.split(",")

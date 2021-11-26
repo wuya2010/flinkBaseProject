@@ -17,8 +17,8 @@ object ProcessFunctionTest {
     env.setParallelism(1)
     //    env.setStreamTimeCharacteristic(TimeCharacteristic.ProcessingTime)
 
-    //    val inputStream = env.socketTextStream("localhost", 7777)
-    val inputStream = env.readTextFile("E:\\WORKS\\Mine\\flinkBaseProject\\flinkBase\\src\\main\\resources\\sensor.txt")
+        val inputStream = env.socketTextStream("192.168.25.229", 7777)
+//    val inputStream = env.readTextFile("E:\\WORKS\\Mine\\flinkBaseProject\\flinkBase\\src\\main\\resources\\sensor.txt")
 
 
     val dataStream = inputStream
@@ -37,7 +37,9 @@ object ProcessFunctionTest {
       //fixme: keyStream
       .process(new TempIncreseWarning())
 
-    warningStream.print("process")
+    // 输出测试
+     // fixme: 该流与 watermark 无关 ， 在系统时间内， 温度上升则预警
+//    warningStream.print("process")
 
 
 
@@ -45,9 +47,10 @@ object ProcessFunctionTest {
     val freezingMonitorStream = dataStream
       .process(new FreezingMonitor())
 
-    freezingMonitorStream.print("freezing")
-    //输出侧输出流
-    freezingMonitorStream.getSideOutput(new OutputTag[(String, String)]("freezing-warning")).print("side")
+    // 输出测试
+//    freezingMonitorStream.print("freezing")
+//    //输出侧输出流
+//    freezingMonitorStream.getSideOutput(new OutputTag[(String, String)]("freezing-warning")).print("side")
 
 
     // 3. 温度跳变报警
@@ -68,11 +71,6 @@ object ProcessFunctionTest {
       }
     }
 
-
-
-    //    freezingMonitorStream.print("healthy")
-    //    freezingMonitorStream.getSideOutput(new OutputTag[(String, String)]("freezing-warning")).print("freezing")
-
 //    tempChangeWarningStream.print("change")
 
     env.execute("process function test")
@@ -85,11 +83,11 @@ class TempIncreseWarning() extends KeyedProcessFunction[String, SensorReading, S
   //定义状态
   // 定义一个状态，用户保存上一次的温度值
   lazy val lastTemp: ValueState[Double] = getRuntimeContext.getState(new ValueStateDescriptor[Double]("lastTemp-state", Types.of[Double]))
-  // 定义一个状态，用户保存定时器的时间戳
+  // 定义一个状态，用户保存定时器的时间戳, fixme: 作为一个标记为
   lazy val currentTimer: ValueState[Long] = getRuntimeContext.getState(new ValueStateDescriptor[Long]("currentTimer-state", Types.of[Long]))
 
   override def onTimer(timestamp: Long, ctx: KeyedProcessFunction[String, SensorReading, String]#OnTimerContext, out: Collector[String]): Unit = {
-    out.collect("sensor " + ctx.getCurrentKey + "温度5秒内连续上升") //主流输出
+    out.collect("sensor " + ctx.getCurrentKey + "温度2秒内连续上升") //主流输出
     currentTimer.clear()
   }
 
@@ -103,7 +101,9 @@ class TempIncreseWarning() extends KeyedProcessFunction[String, SensorReading, S
 
     // 如果温度上升，而且没有设置过定时器，就注册一个定时器
     if (value.temperature > prevTemp && curTimerTs == 0) {
-      val timerTs = ctx.timerService().currentProcessingTime() + 1000L //温度10s连续上升, 定时器（定时器的作用）
+      // fixme: currentProcessingTime： 当前系统处理时间  2021-11-24 10:32:46
+      val timerTs = ctx.timerService().currentProcessingTime() + 2000L //温度10s连续上升, 定时器（定时器的作用）
+      // fixme: 注册时间为系统时间 + 10s
       ctx.timerService().registerProcessingTimeTimer(timerTs)
       // 保存时间戳到状态
       currentTimer.update(timerTs)

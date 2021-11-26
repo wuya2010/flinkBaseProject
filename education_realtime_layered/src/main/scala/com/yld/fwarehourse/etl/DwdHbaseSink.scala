@@ -12,6 +12,7 @@ import org.apache.hadoop.hbase.{HBaseConfiguration, TableName}
 
 //定义hbase sink
 class DwdHbaseSink extends RichSinkFunction[TopicAndValue] {
+   // 获取 connection
   var connection: Connection = _
 
   //打开hbase连接： 根据分区会重复调用，有几个分区就调用几次
@@ -41,6 +42,7 @@ class DwdHbaseSink extends RichSinkFunction[TopicAndValue] {
 
   def invokeBaseWebSite(tableNamae: String, value: TopicAndValue): Unit = {
     val gson = new Gson()
+    //解析 string
     val basewebsite = gson.fromJson(value.value, classOf[BaseWebSite])
     val table = connection.getTable(TableName.valueOf(tableNamae))
     //fixme: 怎么放入 put

@@ -23,7 +23,7 @@ object RedisSink {
       .build()
 
     //获取数据源
-    val inputStream = env.readTextFile("E:\\01_myselfProject\\spark_flink_project\\flink_streaming\\src\\main\\resources\\sensor.txt")
+    val inputStream = env.readTextFile("E:\\01_myselfProject\\spark_flink_project\\flink_streaming\\src\\main\\resources\\sensor.csv")
 
     //转换
     val dataStream = inputStream

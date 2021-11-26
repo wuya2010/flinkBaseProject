@@ -40,7 +40,7 @@ object Hots {
 
     // 543462,1715,1464116,pv,1511658000
 
-    val inputStream = env.socketTextStream("192.168.25.229",7777)
+    val inputStream: DataStream[UserBehavior] = env.socketTextStream("192.168.25.229",7777)
       .map(data => {
         val dataArray = data.split(",")
         //UserBehavior(userId: Long, itemId: Long, categoryId: Int, behavior: String, timestamp: Long
@@ -53,13 +53,45 @@ object Hots {
     val aggStream: DataStream[ItemViewCount] = inputStream
       .filter(_.behavior == "pv") // 过滤出pv数据
       .keyBy(_.itemId)//对商品进行分组 , 各分区数据在同一个 task 中
-      .timeWindow(Time.hours(1), Time.seconds(30)) // 开窗进行统计， 基于哪个参数进行开窗
+      .timeWindow(Time.seconds(10), Time.seconds(5)) // 开窗进行统计， 基于哪个参数进行开窗
       .aggregate(new CountAgg(), new WindowCountResult()) // 聚合出当前商品在时间窗口内的统计数量
 
+    /**
+     * ==>  aggStream.print("agg")
+     * 窗口得关闭时间
+     * ItemViewCount(1715,1511657995000,1511658005000,1) ==> [08:59:55,09:00:05]
+     * ItemViewCount(1715,1511658005000,1511658015000,1) ==> [2017-11-26 09:00:05,2017-11-26 09:00:15] 窗口关闭时间  2017-11-26 09:00:50
+     *
+     * 时间：2017-11-26 09:01:09 关闭 [2017-11-26 09:00:55,2017-11-26 09:01:05]
+     *  2017-11-26 09:01:19 关闭 [2017-11-26 09:01:00,2017-11-26 09:01:10]
+     */
+
+
+    /**
+     * 上一步聚合出结果
+     * agg:1> ItemViewCount(1716,1511658005000,1511658015000,5)
+     * agg:4> ItemViewCount(1717,1511658005000,1511658015000,3)
+     * agg:5> ItemViewCount(1715,1511658005000,1511658015000,3)
+     *
+     * 传到keyby 后，不能马上出结果
+     * 写入数据
+     * 543463,1716,1464116,pv,1511658024
+     * 543463,1717,1464116,pv,1511658024
+     * 543463,1715,1464116,pv,1511658024
+     *  窗口关闭：
+     * process:4> 时间：2017-11-26 09:00:15.0
+     * No1: 商品ID=1716 点击量=5
+     * No2: 商品ID=1717 点击量=3
+     *
+     * fxime: 等到新一个窗口到达后，才会出结果
+     */
+    aggStream.print("agg")
+
     // 对聚合结果按照窗口分组，并排序
+    //fixme:  将聚合后得结果作为流式数据源文件，进行keyby
     val processedStream = aggStream
       .keyBy(_.windowEnd)
-      .process(new TopNHotItems(3)) // 用process function做排序处理，得到top N
+      .process(new TopNHotItems(2)) // 用process function做排序处理，得到top N
 
     //    inputStream.print("input")
     //    aggStream.print("agg")
@@ -74,7 +106,8 @@ object Hots {
 // 数据格式 ： 543462,1715,1464116,pv,1511658000
 case class UserBehavior(userId: Long, itemId: Long, categoryId: Int, behavior: String, timestamp: Long)
 //中间样例
-case class ItemViewCount(itemId: Long, windowEnd: Long,count: Long)
+//case class ItemViewCount(itemId: Long, windowEnd: Long,count: Long)
+case class ItemViewCount(itemId: Long, windowStart:Long, windowEnd: Long,count: Long)
 
 
 // 自定义的预聚合函数，来一条数据就加一 <IN, ACC, OUT>
@@ -113,7 +146,8 @@ class WindowCountResult() extends WindowFunction[Long, ItemViewCount, Long, Time
   //    out.collect( ItemViewCount(itemId, windowEnd, count) )
   //  }
   override def apply(key: Long, window: TimeWindow, input: Iterable[Long], out: Collector[ItemViewCount]): Unit = {
-    out.collect(ItemViewCount(key, window.getEnd, input.iterator.next()))
+//    out.collect(ItemViewCount(key, window.getStart, input.iterator.next()))  // 窗口关闭时间： agg:5> ItemViewCount(1715,1511658005000,2)
+    out.collect(ItemViewCount(key, window.getStart,window.getEnd, input.iterator.next()))  // 窗口关闭时间： agg:5> ItemViewCount(1715,1511658005000,2)
   }
 }
 
@@ -138,6 +172,7 @@ class TopNHotItems(topSize: Int) extends KeyedProcessFunction[Long, ItemViewCoun
   override def processElement(value: ItemViewCount, ctx: KeyedProcessFunction[Long, ItemViewCount, String]#Context, out: Collector[String]): Unit = {
     // 每来一条数据，就保存入list state，注册一个定时器
     itemListState.add(value)
+    // fixme: 每一个窗口数据过来，都会生成一个 timeService()
     ctx.timerService().registerEventTimeTimer(value.windowEnd)
   }
 

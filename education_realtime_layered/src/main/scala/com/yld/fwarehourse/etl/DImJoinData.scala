@@ -95,7 +95,7 @@ object DImJoinData {
       //      .window(SlidingEventTimeWindows.of(Time.seconds(10), Time.seconds(5)))
       //      .window(ProcessingTimeSessionWindows.withGap(Time.seconds(5)))
       .window(TumblingEventTimeWindows.of(Time.minutes(10))) //基于事件事件
-      .trigger(CountTrigger.of(1)) //触发器： 来一条触发一条（这个设置要注意）
+      .trigger(CountTrigger.of(1)) //fixme: 触发器： 来一条触发一条（这个设置要注意）
       .apply(new MemberLeftJoinRegtype) //具体定义里面怎么处理
   // todo: 需要重新指定时间戳，不然下面是关联不上的
       .assignTimestampsAndWatermarks(new BoundedOutOfOrdernessTimestampExtractor[String](Time.seconds(10)) {
@@ -137,6 +137,8 @@ object DImJoinData {
       //2个迭代器： left 不可丢失数据
       val leftIterator = first.iterator()
       val rightIterator = second.iterator()
+
+      val t = first.iterator()
 
       while (leftIterator.hasNext) {
         val dwdMember = leftIterator.next()

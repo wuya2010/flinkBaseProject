@@ -241,6 +241,7 @@ public class BaseMemberKafkaProducer {
 
     //fixme: 实时数仓 kafkaProducer
     public static class MemberLog {
+        // 类变量， 随着类的加载而加载
         private static String[] dns = new String[]{"webA", "webB", "webC"};
         private static String[] type = new String[]{"insert", "update"};
         private static int[][] range = {{607649792, 608174079},//36.56.0.0-36.63.255.255

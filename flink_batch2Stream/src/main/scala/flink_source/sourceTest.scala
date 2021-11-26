@@ -24,7 +24,7 @@ object sourceTest {
     val list_ds = getListSource(env)
 
     //从path 获取ds
-    val file_ds = getFileSource(env, "E:\\01_myselfProject\\spark_flink_project\\flink_streaming\\src\\main\\resources\\sensor.txt")
+    val file_ds = getFileSource(env, "E:\\01_myselfProject\\spark_flink_project\\flink_streaming\\src\\main\\resources\\sensor.csv")
 
     //读取匹配文件
     val properties = new Properties()

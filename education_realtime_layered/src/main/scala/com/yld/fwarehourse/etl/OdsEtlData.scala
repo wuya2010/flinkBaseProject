@@ -86,14 +86,12 @@ object OdsEtlData {
     //侧输出流得到 需要写入hbase的数据
     //        result.getSideOutput(sideOutGreenPlumTag).addSink(new DwdGreenPlumSink)
 
-//    result.getSideOutput(sideOutHbaseTag).addSink(new DwdHbaseSink) // 侧输出流从 hbase 流出
+    val t = result.getSideOutput(sideOutHbaseTag)//
+//     t.addSink(new DwdHbaseSink()) // fixme: 侧输出流从 hbase 流出
 
-    //    //事实表数据写入第二层kafka： 2 层 kafka
+    //    //事实表数据写入第二层kafka： 2 层 kafka  topicid 没有指定
     result.addSink(new FlinkKafkaProducer010[TopicAndValue](GlobalConfig.BOOTSTRAP_SERVERS, "", new DwdKafkaProducerSerializationSchema))//自定义：序列化类
     env.execute()
   }
 
-  class DwdHbaseSink(){
-
-  }
 }

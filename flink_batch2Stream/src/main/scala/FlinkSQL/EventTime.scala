@@ -20,7 +20,10 @@ object EventTime {
     //SteamTableEnvironment
     val TableEnv = StreamTableEnvironment.create(env)
 
-    val inputStream: DataStream[String] = env.readTextFile("E:\\WORKS\\Mine\\flinkBaseProject\\flink_batch2Stream\\src\\main\\resources\\sensor.txt")
+//    val inputStream: DataStream[String] = env.readTextFile("E:\\WORKS\\Mine\\flinkBaseProject\\flink_batch2Stream\\src\\main\\resources\\sensor.csv")
+    val inputStream = env.socketTextStream("192.168.25.229", 7777)
+
+
     val dataStream: DataStream[SensorReading] = inputStream
       .map(data => {
         val dataArray = data.split(",").map(x=>x.trim)
@@ -29,12 +32,16 @@ object EventTime {
       //定义 watermark 的生成方式
       .assignAscendingTimestamps(_.timestamp * 1000L)
 
-    // fixme: 根据每个记录中包含的时间生成结果,这样即使在有乱序事件或者延迟事件时，也可以获得正确的结果
+
+
+
+    // fixme: 4种方式，获取watermark
+    // 根据每个记录中包含的时间生成结果,这样即使在有乱序事件或者延迟事件时，也可以获得正确的结果
     //1. 根据 DataStream 转化成 Table 时指定
-    val resultTable =  TableEnv.fromDataStream(dataStream,"id","timestamp".rowtime,"temperature")
+//    val resultTable =  TableEnv.fromDataStream(dataStream,"id","timestamp".rowtime,"temperature")
 
     //2. 直接追加字段 fixme:  rowtime 是什么？
-    val resultTable2 = TableEnv.fromDataStream(dataStream,"id","temperature","timestamp","rt".rowtime)
+//    val resultTable2 = TableEnv.fromDataStream(dataStream,"id","temperature","timestamp","rt".rowtime)
 
     //3. 定义TableSchema指定
     TableEnv.connect(
@@ -56,8 +63,11 @@ object EventTime {
 
 
     //4. 创建ddl指定
-    // 这里 FROM_UNIXTIME 是系统内置的时间函数，用来将一个整数（秒数）转换成“YYYY-MM-DD hh:mm:ss”格式
+    // fixme: 这里 FROM_UNIXTIME 是系统内置的时间函数，用来将一个整数（秒数）转换成“YYYY-MM-DD hh:mm:ss”格式
     // TO_TIMESTAMP 将其转换成 Timestamp
+    /**
+     *  报错： Watermark statement is not supported in Old Planner, please use Blink Planner instead.
+     */
     val sinkDDL: String =
       """
         |create table dataTable (
@@ -68,20 +78,13 @@ object EventTime {
         |  watermark for rt as rt - interval '1' second
         |) with (
         |  'connector.type' = 'filesystem',
-        |  'connector.path' = 'file:///D:\\..\\sensor.txt',
+        |  'connector.path' = 'file:///D:\\..\\sensor.csv',
         |  'format.type' = 'csv'
         |)
       """.stripMargin
     TableEnv.sqlUpdate(sinkDDL) // 执行 DDL
 
-
-
-
-
-
-
-
-
+    env.execute("get")
 
   }
 }

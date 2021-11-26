@@ -48,16 +48,24 @@ object Func1 {
 
 
     // 定义好 DataStream
-    val inputStream: DataStream[String] = env.readTextFile("sensor.txt")
-    val dataStream: DataStream[SensorReading] = inputStream
+//    val inputStream: DataStream[String] = env.readTextFile("sensor.csv")
+//    val dataStream: DataStream[SensorReading] = inputStream
+//      .map(data => {
+//        val dataArray = data.split(",")
+//        SensorReading(dataArray(0), dataArray(1).toLong, dataArray(2).toDouble)
+//      })
+//      .assignAscendingTimestamps(_.timestamp * 1000L)
+
+    val inputStream = env.socketTextStream("192.168.25.229", 7777)
+    val dataStream= inputStream
       .map(data => {
-        val dataArray = data.split(",")
-        SensorReading(dataArray(0), dataArray(1).toLong, dataArray(2).toDouble)
-      })
+                val dataArray = data.split(",").map(x=>x.trim)
+                SensorReading(dataArray(0), dataArray(1).toLong, dataArray(2).toDouble)
+              })
       .assignAscendingTimestamps(_.timestamp * 1000L)
 
     // 将 DataStream转换为 Table，并指定时间字段
-    val sensorTable = tableEnv.fromDataStream(dataStream, 'id, 'timestamp.rowtime, 'temperature)
+    val sensorTable = tableEnv.fromDataStream(dataStream , 'id, 'timestamp.rowtime, 'temperature)
 
     // Table API中使用
     val hashCode = new HashCode(10)
@@ -65,14 +73,17 @@ object Func1 {
     val resultTable = sensorTable
       .select( 'id, hashCode('id) )
 
+
+    // 转换成流，打印输出
+//    resultTable.toAppendStream[(String,Int)].print("table")
+
     // SQL 中使用
     tableEnv.createTemporaryView("sensor", sensorTable)
     tableEnv.registerFunction("hashCode",hashCode)
     val resultSqlTable = tableEnv.sqlQuery("select id, hashCode(id) from sensor")
 
-    // 转换成流，打印输出
-    resultTable.toAppendStream[Row].print("table")
-    resultSqlTable.toAppendStream[Row].print("sql")
+    // sql 输出
+    resultSqlTable.toAppendStream[(String,Int)].print("table")
 
     env.execute()
 

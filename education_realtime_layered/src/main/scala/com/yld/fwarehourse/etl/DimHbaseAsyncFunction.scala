@@ -38,7 +38,7 @@ class DimHbaseAsyncFunction extends RichAsyncFunction[String, String] {
     //初始化缓存： 目的 减小对hbase 的查询
     cache = CacheBuilder.newBuilder()
       .concurrencyLevel(12) //设置并发级别 允许12个线程同时访问
-      .expireAfterAccess(2, TimeUnit.HOURS) //设置缓存 2小时 过期
+      .expireAfterAccess(2, TimeUnit.HOURS) //设置缓存 2小时 过期 ; fixme: 存放在内存吗？
       .maximumSize(10000) //设置缓存大小
       .build()
   }
@@ -64,6 +64,7 @@ class DimHbaseAsyncFunction extends RichAsyncFunction[String, String] {
           conf.set("hbase.zookeeper.quorum", GlobalConfig.HBASE_ZOOKEEPER_QUORUM)
           conf.set("hbase.zookeeper.property.clientPort", GlobalConfig.HBASE_ZOOKEEPER_PROPERTY_CLIENTPORT)
           val connection = ConnectionFactory.createConnection(conf)
+
           //封装方法： 查询hbase维度表数据，得到关联好的数据
           val resultJsonObject = getHbaseJoinData(input, connection, cache)
 

@@ -21,7 +21,7 @@ object sqlWindowTable {
     //SteamTableEnvironment
     val TableEnv = StreamTableEnvironment.create(env)
 
-    val inputStream: DataStream[String] = env.readTextFile("E:\\01_myselfProject\\Base\\spark_flink_project\\flink_streaming\\src\\main\\resources\\sensor.txt")
+    val inputStream: DataStream[String] = env.readTextFile("E:\\WORKS\\Mine\\flinkBaseProject\\flink_batch2Stream\\src\\main\\resources\\sensor.csv")
     val dataStream: DataStream[SensorReading] = inputStream
       .map(data => {
         val dataArray = data.split(",").map(x=>x.trim)
@@ -41,14 +41,15 @@ object sqlWindowTable {
     //Tumble_start ; Tumble_end ; Tumble_rowtime ; Tumble_proctime
 
 
-    //Over Window : 所有聚合必须在同一窗口上定义 ;ORDER BY必须在单一的时间属性上指定
+    //Over Window : 所有聚合必须在同一窗口上定义 ;
+    // ORDER BY必须在单一的时间属性上指定
     // 必须是相同的分区、排序和范围
 
 
-    val windowTable  = resultTable
-      .window(Tumble over 10.seconds on 'timestamp as 'tw)
-      .groupBy('id,'tw)
-      .select('id,'id.count)
+//    val windowTable  = resultTable
+//      .window(Tumble over 10.seconds on 'timestamp as 'tw)
+//      .groupBy('id,'tw)
+//      .select('id,'id.count)
 
     val sqlDataTable: Table = resultTable
       .select('id, 'temperature, 'timestamp as 'ts)
