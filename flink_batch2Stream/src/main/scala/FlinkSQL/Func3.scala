@@ -30,21 +30,20 @@ object Func3 {
     val tableEnv = StreamTableEnvironment.create( env, settings )
 
 
-    // 定义好 DataStream
-    val inputStream: DataStream[String] = env.readTextFile("sensor.csv")
+    val inputStream = env.socketTextStream("192.168.25.229", 7777)
+
     val dataStream: DataStream[SensorReading] = inputStream
       .map(data => {
         val dataArray = data.split(",")
-        SensorReading(dataArray(0), dataArray(1).toLong, dataArray(2).toDouble)
+        SensorReading(dataArray(0), dataArray(1).trim.toLong, dataArray(2).trim.toDouble)
       })
       .assignAscendingTimestamps(_.timestamp * 1000L)
 
-    val sensorTable = tableEnv.fromDataStream(dataStream,"id","timestamp")
+    val sensorTable = tableEnv.fromDataStream(dataStream,'id,'temperature)
 
 
 
-
-    //聚合函数
+    //聚合函数 ==》自定义聚合函数  sensor_1, 1547718199, 30.8
     // createAccumulator ； accumulate ； getValue ; retract ; merge ; resetAccumulator
     val avgTemp = new AvgTemp()
 
@@ -56,6 +55,7 @@ object Func3 {
     // SQL的实现
     tableEnv.createTemporaryView("sensor", sensorTable)
     tableEnv.registerFunction("avgTemp", avgTemp)
+
     val resultSqlTable = tableEnv.sqlQuery(
       """
         |SELECT
@@ -66,8 +66,18 @@ object Func3 {
       """.stripMargin)
 
     // 转换成流打印输出
-    resultTable.toRetractStream[(String, Double)].print("agg temp")
+    /**
+     * 每来一条数据，对状态进行修改
+     * agg temp> (true,(sensor_1,34.55))
+     * agg temp> (false,(sensor_1,34.55))
+     * agg temp> (true,(sensor_1,33.8))
+     * agg temp> (false,(sensor_1,33.8))
+     */
+//    resultTable.toRetractStream[(String, Double)].print("agg temp")
+
     resultSqlTable.toRetractStream[Row].print("agg temp sql")
+
+    env.execute()
 
   }
 

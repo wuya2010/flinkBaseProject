@@ -1,5 +1,6 @@
 package FlinkSQL
 
+import flink_source.SensorReading
 import org.apache.flink.streaming.api.scala._
 import org.apache.flink.table.api._
 import org.apache.flink.table.api.scala.StreamTableEnvironment
@@ -32,8 +33,18 @@ object FlinkTableApi {
     val batchEnv = TableEnvironment.create(batchSetting)
 
 
+    val inputStream = env.socketTextStream("192.168.25.229", 7777)
+    val dataStream = inputStream
+      .map(data => {
+        val dataArray = data.split(",")
+        SensorReading(dataArray(0).trim, dataArray(1).trim.toLong, dataArray(2).trim.toDouble)
+      })
+
+
+
+
     //连接到文件系统
-    val t  = TableEnv
+    val tempTable  = TableEnv
       //streamTableDescriptor
       .connect(new FileSystem()
         .path("E:\\WORKS\\Mine\\flinkBaseProject\\flink_batch2Stream\\src\\main\\resources\\sensor.csv"))
@@ -120,9 +131,7 @@ object FlinkTableApi {
 
 
 
-      //连接一张表
-    val result: Table = TableEnv.from("inputTable")  //获取流式数据
-
+    val result = TableEnv.fromDataStream(dataStream)
 
     //表查询 TableApi
    val ret: Table =  result.select("id,temperature").filter("id='sensor_1'")
@@ -133,7 +142,10 @@ object FlinkTableApi {
 //      .groupBy("key").select("key, value.avg")
       .select("id, id.count as count")
 
-    //表查询 Sql
+
+
+
+    //从临时表读取数据： 表查询 Sql
     val sqlTable = TableEnv.sqlQuery("select id, temperature from inputTable where id ='sensor_1'")
 
 
@@ -149,10 +161,11 @@ object FlinkTableApi {
     val resultStream =
 //      result.toAppendStream[(String,Long,Double)]
 
-      sqlTable2.toAppendStream[(String, Double)]
+//      sqlTable2.toAppendStream[(String, Double)]
 
 //      aggTable.toRetractStream[(String,Long)]
 
+      ret.toRetractStream[(String,Double)]
     /**
      * toAppendStream 报错：
      * 相关问题： Table is not an append-only table. Use the toRetractStream() in order to handle add and retract messages.

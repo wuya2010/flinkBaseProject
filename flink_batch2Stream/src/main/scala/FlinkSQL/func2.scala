@@ -32,15 +32,18 @@ object func2 {
 
 
     // 定义好 DataStream
-    val inputStream: DataStream[String] = env.readTextFile("sensor.csv")
+//    val inputStream: DataStream[String] = env.readTextFile("sensor.csv")
+
+    val inputStream = env.socketTextStream("192.168.25.229", 7777)
+
     val dataStream: DataStream[SensorReading] = inputStream
       .map(data => {
         val dataArray = data.split(",")
-        SensorReading(dataArray(0), dataArray(1).toLong, dataArray(2).toDouble)
+        SensorReading(dataArray(0), dataArray(1).trim.toLong, dataArray(2).trim.toDouble)
       })
       .assignAscendingTimestamps(_.timestamp * 1000L)
 
-    val sensorTable = tableEnv.fromDataStream(dataStream,"id","timestamp")
+    val sensorTable = tableEnv.fromDataStream(dataStream,'id,'temperature)
 
 
 //    *   class MySplitUDTF extends TableFunction<String> {
@@ -65,6 +68,7 @@ object func2 {
       .leftOuterJoinLateral(split('id) as ('word, 'length))
       .select('id, 'word, 'length)
 
+    //sensosssr_2, 1547718199, 35.8
 
     //sql 方式
     tableEnv.createTemporaryView("sensor", sensorTable)
@@ -92,8 +96,10 @@ object func2 {
 
 
     // 转换成流打印输出
-    resultTable.toAppendStream[Row].print("1")
-    resultTable2.toAppendStream[Row].print("2")
+    resultSqlTable.toAppendStream[Row].print("1")
+    resultSqlTable2.toAppendStream[Row].print("2")
+
+    env.execute()
 
 
   }

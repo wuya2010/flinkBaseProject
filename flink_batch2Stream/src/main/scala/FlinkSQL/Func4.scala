@@ -31,15 +31,16 @@ object Func4 {
 
 
     // 定义好 DataStream
-    val inputStream: DataStream[String] = env.readTextFile("sensor.csv")
+    val inputStream = env.socketTextStream("192.168.25.229", 7777)
+
     val dataStream: DataStream[SensorReading] = inputStream
       .map(data => {
         val dataArray = data.split(",")
-        SensorReading(dataArray(0), dataArray(1).toLong, dataArray(2).toDouble)
+        SensorReading(dataArray(0), dataArray(1).trim.toLong, dataArray(2).trim.toDouble)
       })
       .assignAscendingTimestamps(_.timestamp * 1000L)
 
-    val sensorTable = tableEnv.fromDataStream(dataStream,"id","timestamp")
+    val sensorTable = tableEnv.fromDataStream(dataStream,'id,'temperature)
 
 
     //创建表聚合函数

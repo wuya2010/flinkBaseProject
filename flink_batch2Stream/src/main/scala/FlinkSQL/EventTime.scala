@@ -18,7 +18,7 @@ object EventTime {
     val env: StreamExecutionEnvironment = StreamExecutionEnvironment.getExecutionEnvironment
 
     //SteamTableEnvironment
-    val TableEnv = StreamTableEnvironment.create(env)
+    val TableEnv: StreamTableEnvironment = StreamTableEnvironment.create(env)
 
 //    val inputStream: DataStream[String] = env.readTextFile("E:\\WORKS\\Mine\\flinkBaseProject\\flink_batch2Stream\\src\\main\\resources\\sensor.csv")
     val inputStream = env.socketTextStream("192.168.25.229", 7777)
@@ -40,7 +40,7 @@ object EventTime {
     //1. 根据 DataStream 转化成 Table 时指定
 //    val resultTable =  TableEnv.fromDataStream(dataStream,"id","timestamp".rowtime,"temperature")
 
-    //2. 直接追加字段 fixme:  rowtime 是什么？
+    //2. 直接追加字段
 //    val resultTable2 = TableEnv.fromDataStream(dataStream,"id","temperature","timestamp","rt".rowtime)
 
     //3. 定义TableSchema指定
@@ -51,7 +51,7 @@ object EventTime {
     .withSchema(new Schema()
         .field("id", DataTypes.STRING())
         .field("temperature", DataTypes.BIGINT())
-        //指定 eventTime : 将前面定义的字段指定为事件时间属性。
+        //指定 eventTime :rowtime的作用： 将前面定义的字段指定为事件时间属性。
         .rowtime(
           new Rowtime()
            .timestampsFromField("timestamp") // 从字段中提取时间戳

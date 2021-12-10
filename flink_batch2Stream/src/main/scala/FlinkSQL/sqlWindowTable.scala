@@ -21,11 +21,12 @@ object sqlWindowTable {
     //SteamTableEnvironment
     val TableEnv = StreamTableEnvironment.create(env)
 
-    val inputStream: DataStream[String] = env.readTextFile("E:\\WORKS\\Mine\\flinkBaseProject\\flink_batch2Stream\\src\\main\\resources\\sensor.csv")
+    val inputStream = env.socketTextStream("192.168.25.229", 7777)
+
     val dataStream: DataStream[SensorReading] = inputStream
       .map(data => {
-        val dataArray = data.split(",").map(x=>x.trim)
-        SensorReading(dataArray(0), dataArray(1).toLong, dataArray(2).toDouble)
+        val dataArray = data.split(",")
+        SensorReading(dataArray(0), dataArray(1).trim.toLong, dataArray(2).trim.toDouble)
       })
       .assignTimestampsAndWatermarks(
         new BoundedOutOfOrdernessTimestampExtractor[SensorReading](Time.seconds(1L)) {
@@ -52,11 +53,13 @@ object sqlWindowTable {
 //      .select('id,'id.count)
 
     val sqlDataTable: Table = resultTable
-      .select('id, 'temperature, 'timestamp as 'ts)
+      // 窗口的使用
+      .select('id, 'temperature, 'rowtime as 'ts)
 
+    //窗口获取聚合值
     val resultSqlTable: Table = TableEnv
       .sqlQuery("select id, count(id) from "
-        + sqlDataTable
+        + resultTable
         + " group by id,tumble(ts,interval '10' second)")
 
     // 把 Table转化成数据流, 新增
@@ -65,10 +68,6 @@ object sqlWindowTable {
 
     resultDstream.filter(_._1).print()
     env.execute()
-
-
-
-
 
   }
 }

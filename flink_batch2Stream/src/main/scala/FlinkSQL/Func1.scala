@@ -6,8 +6,12 @@ import org.apache.flink.streaming.api.TimeCharacteristic
 import org.apache.flink.streaming.api.scala._
 import org.apache.flink.table.api._
 import org.apache.flink.table.api.scala._
+import org.apache.flink.table.catalog.stats.Date
 import org.apache.flink.table.descriptors._
 import org.apache.flink.table.functions.ScalarFunction
+import org.apache.flink.table.plan.schema.TimeIndicatorRelDataType
+import org.apache.flink.table.types.logical.TimestampType
+import org.apache.flink.table.typeutils.TimeIndicatorTypeInfo
 
 
 
@@ -66,12 +70,14 @@ object Func1 {
 
     // 将 DataStream转换为 Table，并指定时间字段
     val sensorTable = tableEnv.fromDataStream(dataStream , 'id, 'timestamp.rowtime, 'temperature)
+    //==> fixme: timestamp: TIMESTAMP(3) *ROWTIME*
 
     // Table API中使用
     val hashCode = new HashCode(10)
 
     val resultTable = sensorTable
-      .select( 'id, hashCode('id) )
+//      .select( 'id, hashCode('id))
+      .select( 'id,'temperature, hashCode('id))
 
 
     // 转换成流，打印输出
@@ -80,10 +86,14 @@ object Func1 {
     // SQL 中使用
     tableEnv.createTemporaryView("sensor", sensorTable)
     tableEnv.registerFunction("hashCode",hashCode)
-    val resultSqlTable = tableEnv.sqlQuery("select id, hashCode(id) from sensor")
 
+//    val resultSqlTable = tableEnv.sqlQuery("select id, hashCode(id) from sensor")
     // sql 输出
-    resultSqlTable.toAppendStream[(String,Int)].print("table")
+//    resultSqlTable.toAppendStream[(String,Int)].print("table")
+
+    val resultSqlTable = tableEnv.sqlQuery("select id, temperature , hashCode(id) from sensor")
+//    sensorTable.printSchema()
+    resultSqlTable.toAppendStream[(String,Double,Int)].print("table")
 
     env.execute()
 
