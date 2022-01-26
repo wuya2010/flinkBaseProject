@@ -5,7 +5,7 @@ import org.apache.calcite.interpreter.Row
 import org.apache.flink.streaming.api.TimeCharacteristic
 import org.apache.flink.streaming.api.scala._
 import org.apache.flink.table.api._
-import org.apache.flink.table.api.scala._
+import org.apache.flink.table.api.bridge.scala.StreamTableEnvironment
 import org.apache.flink.table.catalog.stats.Date
 import org.apache.flink.table.descriptors._
 import org.apache.flink.table.functions.ScalarFunction
@@ -93,7 +93,9 @@ object Func1 {
 
     val resultSqlTable = tableEnv.sqlQuery("select id, temperature , hashCode(id) from sensor")
 //    sensorTable.printSchema()
-    resultSqlTable.toAppendStream[(String,Double,Int)].print("table")
+
+    // fixme: 过时写法
+//    resultSqlTable.toAppendStream[(String,Double,Int)].print("table")
 
     env.execute()
 

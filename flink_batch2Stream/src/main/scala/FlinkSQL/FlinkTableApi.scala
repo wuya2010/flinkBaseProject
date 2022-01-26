@@ -3,7 +3,7 @@ package FlinkSQL
 import flink_source.SensorReading
 import org.apache.flink.streaming.api.scala._
 import org.apache.flink.table.api._
-import org.apache.flink.table.api.scala.StreamTableEnvironment
+import org.apache.flink.table.api.bridge.scala.StreamTableEnvironment
 import org.apache.flink.table.descriptors._
 
 /**
@@ -157,7 +157,6 @@ object FlinkTableApi {
         |where id ='sensor_1'
       """.stripMargin)
 
-    import org.apache.flink.table.api.scala._
     val resultStream =
 //      result.toAppendStream[(String,Long,Double)]
 
@@ -165,7 +164,8 @@ object FlinkTableApi {
 
 //      aggTable.toRetractStream[(String,Long)]
 
-      ret.toRetractStream[(String,Double)]
+//      ret.toRetractStream[(String,Double)]
+
     /**
      * toAppendStream 报错：
      * 相关问题： Table is not an append-only table. Use the toRetractStream() in order to handle add and retract messages.
@@ -180,7 +180,7 @@ object FlinkTableApi {
      */
 
 
-    resultStream.print("rest")
+//    resultStream.print("rest")
 
     //结果写入输出表
 //    result.insertInto("outputTable")

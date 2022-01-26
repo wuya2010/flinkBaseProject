@@ -4,7 +4,7 @@ import flink_source.SensorReading
 import org.apache.flink.streaming.api.TimeCharacteristic
 import org.apache.flink.streaming.api.scala._
 import org.apache.flink.table.api._
-import org.apache.flink.table.api.scala._
+import org.apache.flink.table.api.bridge.scala.StreamTableEnvironment
 import org.apache.flink.table.functions.TableAggregateFunction
 import org.apache.flink.util.Collector
 
@@ -51,9 +51,10 @@ object Func4 {
       .flatAggregate( top2Temp('temperature) as ('temp, 'rank) )
       .select('id, 'temp, 'rank)
 
-    // 转换成流打印输出
-    resultTable.toRetractStream[(String, Double, Int)].print("agg temp")
-//    resultSqlTable.toRetractStream[Row].print("agg temp sql")
+    // fixme: 过时写法  转换成流打印输出
+//    resultTable.toRetractStream[(String, Double, Int)].print("agg temp")
+
+    //    resultSqlTable.toRetractStream[Row].print("agg temp sql")
 
     env.execute("get func")
 

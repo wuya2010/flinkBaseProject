@@ -9,6 +9,7 @@ import org.apache.flink.streaming.api.TimeCharacteristic
 import org.apache.flink.streaming.api.functions.KeyedProcessFunction
 import org.apache.flink.streaming.api.scala._
 import org.apache.flink.streaming.api.scala.function.WindowFunction
+import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows
 import org.apache.flink.streaming.api.windowing.time.Time
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow
 import org.apache.flink.util.Collector
@@ -40,7 +41,7 @@ object Hots {
 
     // 543462,1715,1464116,pv,1511658000
 
-    val inputStream: DataStream[UserBehavior] = env.socketTextStream("192.168.25.229",7777)
+    val inputStream: DataStream[UserBehavior] = env.socketTextStream("192.168.7.135",7777)
       .map(data => {
         val dataArray = data.split(",")
         //UserBehavior(userId: Long, itemId: Long, categoryId: Int, behavior: String, timestamp: Long
@@ -53,7 +54,17 @@ object Hots {
     val aggStream: DataStream[ItemViewCount] = inputStream
       .filter(_.behavior == "pv") // 过滤出pv数据
       .keyBy(_.itemId)//对商品进行分组 , 各分区数据在同一个 task 中
-      .timeWindow(Time.seconds(10), Time.seconds(5)) // 开窗进行统计， 基于哪个参数进行开窗
+
+//      .window(TumblingEventTimeWindows.of(Time.days(1),Time.hours(16)))
+
+
+       // fixme : 了解窗口的关闭时间
+      // 不加偏移统计的是 整数 ， 加了偏移统计零散值： agg:5> ItemViewCount(1715,1639989000000,1639992600000,1)
+      .window(TumblingEventTimeWindows.of(Time.hours(1),Time.minutes(30))) //按小时统计, 会按整小时进行统计
+
+
+      // window 是滑窗的简写
+//      .timeWindow(Time.seconds(10), Time.seconds(5)) // 开窗进行统计， 基于哪个参数进行开窗
       .aggregate(new CountAgg(), new WindowCountResult()) // 聚合出当前商品在时间窗口内的统计数量
 
     /**
@@ -86,6 +97,9 @@ object Hots {
      * fxime: 等到新一个窗口到达后，才会出结果
      */
     aggStream.print("agg")
+
+
+
 
     // 对聚合结果按照窗口分组，并排序
     //fixme:  将聚合后得结果作为流式数据源文件，进行keyby

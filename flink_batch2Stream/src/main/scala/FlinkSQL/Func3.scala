@@ -4,7 +4,7 @@ import flink_source.SensorReading
 import org.apache.flink.streaming.api.TimeCharacteristic
 import org.apache.flink.streaming.api.scala._
 import org.apache.flink.table.api._
-import org.apache.flink.table.api.scala._
+import org.apache.flink.table.api.bridge.scala.StreamTableEnvironment
 import org.apache.flink.table.functions.AggregateFunction
 import org.apache.flink.types.Row
 
@@ -75,7 +75,8 @@ object Func3 {
      */
 //    resultTable.toRetractStream[(String, Double)].print("agg temp")
 
-    resultSqlTable.toRetractStream[Row].print("agg temp sql")
+    // 过时写法
+//    resultSqlTable.toRetractStream[Row].print("agg temp sql")
 
     env.execute()
 

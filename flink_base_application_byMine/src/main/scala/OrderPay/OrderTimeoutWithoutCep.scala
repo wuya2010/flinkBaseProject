@@ -95,7 +95,7 @@ object OrderTimeoutWithoutCep {
         }
         isPayedState.clear()
         timerState.clear()
-      }coGroup
+      }
     }
   }
 }

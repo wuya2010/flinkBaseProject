@@ -4,7 +4,7 @@ import flink_source.SensorReading
 import org.apache.flink.streaming.api.TimeCharacteristic
 import org.apache.flink.streaming.api.scala._
 import org.apache.flink.table.api._
-import org.apache.flink.table.api.scala._
+import org.apache.flink.table.api.bridge.scala.StreamTableEnvironment
 import org.apache.flink.table.functions._
 import org.apache.flink.types.Row
 
@@ -95,9 +95,9 @@ object func2 {
 
 
 
-    // 转换成流打印输出
-    resultSqlTable.toAppendStream[Row].print("1")
-    resultSqlTable2.toAppendStream[Row].print("2")
+    // fixme: 过时写法 转换成流打印输出
+//    resultSqlTable.toAppendStream[Row].print("1")
+//    resultSqlTable2.toAppendStream[Row].print("2")
 
     env.execute()
 

@@ -27,7 +27,7 @@ object StreamWordCount {
 //    val port = paramTool.getInt("port")
     // 接收一个socket文本流
 //    val dataStream = env.socketTextStream(host, port)
-    val dataStream = env.socketTextStream("192.168.25.229", 7777)
+    val dataStream = env.socketTextStream("hadoop105", 9999)
 
     // 对每条数据进行处理
     val wordCountDataStream = dataStream.flatMap(_.split(" "))

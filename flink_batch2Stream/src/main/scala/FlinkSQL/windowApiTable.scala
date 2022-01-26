@@ -2,8 +2,8 @@ package FlinkSQL
 
 import flink_source.SensorReading
 import org.apache.flink.streaming.api.scala._
+import org.apache.flink.table.api.bridge.scala.StreamTableEnvironment
 import org.apache.flink.table.api.{GroupWindow, Over, Slide}
-import org.apache.flink.table.api.scala._
 
 /**
   * @author kylinWang
@@ -38,9 +38,14 @@ object windowApiTable {
     //      *     .window(Over partitionBy 'c orderBy 'rowTime preceding 10.seconds as 'ow)
     //    *     .select('c, 'b.count over 'ow, 'e.sum over 'ow)
     //    * }
-  resultTable
-    .window(Over partitionBy 'c orderBy 'rowTime preceding 10.seconds as 'ow)
-    .select('c , 'b.count over 'ow , 'e.sum over 'ow)
+
+
+    // fixme: 窗口的语法过时
+//    resultTable
+//    .window(Over partitionBy 'c orderBy 'rowTime preceding 10.seconds as 'ow)
+//    .select('c , 'b.count over 'ow , 'e.sum over 'ow)
+
+
 
   //3. 滑动窗口
 //    over：定义窗口长度
@@ -53,7 +58,9 @@ resultTable
   //process-time window
 //      .window(Slide over 10.minutes every 5.minutes on 'proctime as 'w)
    //row_count window
-      .window(Slide over 10.rows every 5.rows on 'proctime as 'w)
+
+    // fixme: 窗口的语法过时
+//      .window(Slide over 10.rows every 5.rows on 'proctime as 'w)
 
 
 

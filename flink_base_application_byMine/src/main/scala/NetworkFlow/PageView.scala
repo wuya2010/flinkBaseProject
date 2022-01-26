@@ -14,7 +14,7 @@ object PageView {
     env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
     env.setParallelism(1)
 
-    val inputStream = env.readTextFile("D:\\Projects\\BigData\\UserBehaviorAnalysis\\HotItemsAnalysis\\src\\main\\resources\\UserBehavior.csv")
+    val inputStream = env.readTextFile("E:\\WORKS\\Mine\\flinkBaseProject\\flink_base_application_byMine\\src\\main\\resources\\UserBehavior.csv")
       .map(data => {
         val dataArray = data.split(",")
         UserBehavior(dataArray(0).toLong, dataArray(1).toLong, dataArray(2).toInt, dataArray(3), dataArray(4).toLong)

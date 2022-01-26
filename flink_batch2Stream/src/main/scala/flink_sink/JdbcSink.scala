@@ -61,8 +61,9 @@ class MyJdbcSink() extends RichSinkFunction[SensorReading]{
       println("mysql 连接成功......")
   }
 
+
   //具体执行
-  override def invoke(value: SensorReading, context: SinkFunction.Context[_]): Unit = {
+  override def invoke(value: SensorReading, context: SinkFunction.Context): Unit = {
     //更新数据
     updateStmt.setLong(1,value.timestamp)
     updateStmt.setDouble(2,value.temperature)
@@ -71,7 +72,7 @@ class MyJdbcSink() extends RichSinkFunction[SensorReading]{
     //获取 getUpdateCount
     if(updateStmt.getUpdateCount == 0) {
       //插入
-   // insertStmt.setString(0,value.id)
+      // insertStmt.setString(0,value.id)
       insertStmt.setLong(1,value.timestamp)
       insertStmt.setDouble(2,value.temperature)
       insertStmt.executeUpdate()

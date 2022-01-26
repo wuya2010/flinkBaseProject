@@ -27,8 +27,8 @@ object LoginFail {
 //    val dataStream = env.readTextFile(resource.getPath)
 
 
-    //5402,83.149.11.115,success,1558430815
-    val dataStream= env.socketTextStream("192.168.25.229",7777)
+    //5402,83.149.11.115,success,1558430815  ==> 测试的时候，是否每来一条就返回
+    val dataStream= env.socketTextStream("192.168.7.135",9999)
       .map( data => {
         val dataArray = data.split(",")
         LoginEvent( dataArray(0).toLong, dataArray(1), dataArray(2), dataArray(3).toLong )
@@ -49,7 +49,7 @@ object LoginFail {
        * 5402,83.149.11.115,fail,1511658003
        * 5402,83.149.11.115,fail,1511658004
        * ==》 窗口关闭，获取结果
-       * Warning(5402,1511658000,1511658004,Login fail in 2 seconds for 6 times)
+       * Warning(5402,1511658000,1511658004,Login fail in 5 seconds for 6 times)
        *
        * 5402,83.149.11.115,fail,1511658002
        * 5402,83.149.11.115,fail,1511658000
@@ -57,14 +57,15 @@ object LoginFail {
        * 5402,83.149.11.115,fail,1511658005
        * 5402,83.149.11.115,fail,1511658006
        * ==》 获取窗口
-       * Warning(5402,1511658002,1511658006,Login fail in 2 seconds for 5 times)
+       * Warning(5402,1511658002,1511658006,Login fail in 5 seconds for 5 times)
        *
        */
-//      .process(new LoginFailWarning(2))
+      .process(new LoginFailWarning(2))
 
 
 
-      .process( new LoginFailWarningAdv(2) )
+//      .process( new LoginFailWarningAdv(2) )
+
 
     dataStream.print()
     env.execute("login fail job")
@@ -83,7 +84,7 @@ class LoginFailWarning(failTimes: Int) extends KeyedProcessFunction[Long, LoginE
     if( value.status == "fail" ){
       loginFailListsState.add(value)
       //每次失败,注册一个定时器 , 2s内失败的次数
-      ctx.timerService().registerEventTimeTimer(value.eventTime * 1000L + 2000L)
+      ctx.timerService().registerEventTimeTimer(value.eventTime * 1000L + 5000L)
     } else{
       loginFailListsState.clear()
     }
@@ -98,11 +99,11 @@ class LoginFailWarning(failTimes: Int) extends KeyedProcessFunction[Long, LoginE
       out.collect( Warning( ctx.getCurrentKey,
         loginFailListsState.get().head.eventTime,
         loginFailListsState.get().last.eventTime,
-        "Login fail in 2 seconds for " + count + " times" ) )
+        "Login fail in 5 seconds for " + count + " times" ) )
     }
 
     /**
-     * Warning(5402,1511658000,1511658005,Login fail in 2 seconds for 3 times)  ==> [2017-11-26 09:00:00, 2017-11-26 09:00:05]
+     * Warning(5402,1511658000,1511658005,Login fail in 5 seconds for 3 times)  ==> [2017-11-26 09:00:00, 2017-11-26 09:00:05]
      */
 
     // 清空状态
@@ -132,7 +133,7 @@ class LoginFailWarningAdv(failTimes: Int) extends KeyedProcessFunction[Long, Log
         val firstFailEvent = iter.next()
         // 如果两次登录失败事件间隔小于5秒，输出报警信息---内部逻辑，如果当前时间与状态中的时间差小于 5
         if( (value.eventTime - firstFailEvent.eventTime).abs < 5 ){
-          out.collect( Warning( value.userId, firstFailEvent.eventTime, value.eventTime, "login fail in 2 seconds" ) )
+          out.collect( Warning( value.userId, firstFailEvent.eventTime, value.eventTime, "login fail in 5 seconds" ) )
         }
         loginFailListsState.clear()
         loginFailListsState.add(value)

@@ -4,8 +4,8 @@ import flink_source.SensorReading
 import org.apache.flink.streaming.api.functions.timestamps.BoundedOutOfOrdernessTimestampExtractor
 import org.apache.flink.streaming.api.scala._
 import org.apache.flink.streaming.api.windowing.time.Time
+import org.apache.flink.table.api.bridge.scala.StreamTableEnvironment
 import org.apache.flink.table.api.{Table, Tumble}
-import org.apache.flink.table.api.scala._
 
 /**
   * @author kylinWang
@@ -54,7 +54,7 @@ object sqlWindowTable {
 
     val sqlDataTable: Table = resultTable
       // 窗口的使用
-      .select('id, 'temperature, 'rowtime as 'ts)
+//      .select('id, 'temperature, 'rowtime as 'ts)
 
     //窗口获取聚合值
     val resultSqlTable: Table = TableEnv
@@ -63,10 +63,11 @@ object sqlWindowTable {
         + " group by id,tumble(ts,interval '10' second)")
 
     // 把 Table转化成数据流, 新增
-    val resultDstream: DataStream[(Boolean, (String, Long))] = resultSqlTable
-      .toRetractStream[(String, Long)]
+//    val resultDstream: DataStream[(Boolean, (String, Long))] = resultSqlTable
+//      .toRetractStream[(String, Long)]
 
-    resultDstream.filter(_._1).print()
+//    resultDstream.filter(_._1).print()
+
     env.execute()
 
   }

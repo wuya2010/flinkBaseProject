@@ -3,7 +3,7 @@ package FlinkSQL
 import flink_source.SensorReading
 import org.apache.flink.streaming.api.scala._
 import org.apache.flink.table.api.DataTypes
-import org.apache.flink.table.api.scala._
+import org.apache.flink.table.api.bridge.scala.StreamTableEnvironment
 import org.apache.flink.table.descriptors.{Csv, FileSystem, Rowtime, Schema}
 
 /**

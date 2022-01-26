@@ -3,7 +3,7 @@ package FlinkSQL
 import flink_source.SensorReading
 import org.apache.flink.streaming.api.scala._
 import org.apache.flink.table.api.DataTypes
-import org.apache.flink.table.api.scala._
+import org.apache.flink.table.api.bridge.scala.StreamTableEnvironment
 import org.apache.flink.table.descriptors._
 
 /**
@@ -34,7 +34,7 @@ object ProcessTime {
     // 3. 在创建表的DDL中指定
 
     //方式1：
-    val streaTable = TableEnv.fromDataStream(dataStream, 'id, 'timestamp, 'temperature, 'pt.proctime)
+//    val streaTable = TableEnv.fromDataStream(dataStream, 'id, 'timestamp, 'temperature, 'pt.proctime)
 
     //方式2：
     TableEnv.connect(

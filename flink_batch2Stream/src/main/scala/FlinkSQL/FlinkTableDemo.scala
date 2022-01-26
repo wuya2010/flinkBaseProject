@@ -2,7 +2,8 @@ package FlinkSQL
 
 import flink_source.SensorReading
 import org.apache.flink.streaming.api.scala._
-import org.apache.flink.table.api.scala._  //fixme: 导入依赖
+import org.apache.flink.table.api.bridge.scala.StreamTableEnvironment
+//import org.apache.flink.table.api.scala._  //fixme: 导入依赖
 
 /**
   * @author kylinWang
@@ -39,8 +40,12 @@ object FlinkTableDemo {
     //    |-- id: STRING
     //    |-- timestamp: BIGINT
 
-    val resultSream = resultTable.toAppendStream[(String,Long)]
-    resultSream.print("result")
+
+    // fixme: 过时写法
+//    val resultSream = resultTable.toAppendStream[(String,Long)]
+//    resultSream.print("result")
+
+
 
 
     //展示

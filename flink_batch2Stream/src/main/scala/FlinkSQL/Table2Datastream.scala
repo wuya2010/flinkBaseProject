@@ -5,7 +5,7 @@ import org.apache.flink.streaming.api.functions.timestamps.BoundedOutOfOrderness
 import org.apache.flink.streaming.api.scala._
 import org.apache.flink.streaming.api.windowing.time.Time
 import org.apache.flink.table.api.Table
-import org.apache.flink.table.api.scala._
+import org.apache.flink.table.api.bridge.scala.StreamTableEnvironment
 import org.apache.flink.types.Row
 
 /**
@@ -54,7 +54,6 @@ object Table2Datastream {
 
 
 //撤回模式, 多了一个boolean fixme: 这种方式识别不了 TableEnv.toRetractStream[(String,Long,Double)](resultTable)
-    import org.apache.flink.table.api.scala._
     val getStream2 =  TableEnv.toRetractStream[(String,Long,Double)](resultTable)
 //    False： 老数据
 //    True: 新数据
