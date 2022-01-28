@@ -100,7 +100,8 @@ object testFlinkScala {
 
 
     //从临时表读取数据： 表查询 Sql  fixme：方式2：  没有窗口概念，会一直保存状态
-//    val sqlTable = TableEnv.sqlQuery("select t1.id, t2.id ,t1.temperature,t2.temperature from t1 left join t2 on t1.id = t2.id")
+//    val sqlTable = TableEnv.sqlQuery("select t1.id, t2.id ,t1.temperature,t2.temperature
+    //    from t1 left join t2 on t1.id = t2.id")
 
 
     /**
@@ -109,7 +110,8 @@ object testFlinkScala {
       */
 
     //增加时间窗口， 在时间范围内进行关联  fixme: 支持关联的时间字段类型： <DATETIME_INTERVAL> - <DATETIME_INTERVAL>  用eventTime 作为时间字段
-//    val  sqlTable= TableEnv.sqlQuery("select * from t1 , t2 where t1.id = t2.id  and t1.eventtime between t2.eventtime - INTERVAL '4' SECOND  AND t2.eventtime + INTERVAL '4' SECOND")
+//    val  sqlTable= TableEnv.sqlQuery("select * from t1 , t2 where t1.id = t2.id  and
+    //    t1.eventtime between t2.eventtime - INTERVAL '4' SECOND  AND t2.eventtime + INTERVAL '4' SECOND")
 //
 //    val resultStream = TableEnv.toRetractStream[(String,String,Double,Double)](sqlTable)
 //
